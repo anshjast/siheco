@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'splash_page.dart'; // Import the new splash page
+import 'auth/splash_page.dart'; // Import the new splash page
 
 // The main entry point for the Flutter application.
 void main() {

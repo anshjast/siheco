@@ -38,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 width: 200,
                 height: 200,
                 // CORRECTED: Asset path for gifs
-                child: Image.asset('assets/gifs/sapling.gif'),
+                child: Image.asset('assets/images/sapling.gif'),
               ),
               const SizedBox(height: 24),
               FadeInUp(

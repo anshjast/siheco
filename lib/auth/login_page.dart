@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'main.dart'; // For navigation to HomeScreen
+import '../main.dart'; // For navigation to HomeScreen
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
