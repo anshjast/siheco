@@ -1,47 +1,87 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import '../widgets/header_section.dart';
-import '../widgets/user_profile_card.dart';
-import '../widgets/section_title.dart';
-import '../widgets/challenges_grid.dart';
-import '../widgets/daily_tip_card.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
-class EcoGamesHomePage extends StatelessWidget {
+import '../widgets/daily_tip_card.dart';
+import '../widgets/challenges_grid.dart';
+import '../widgets/header_section.dart';
+import '../widgets/section_title.dart';
+import '../widgets/user_profile_card.dart';
+import '../widgets/floating_nav_bar.dart'; // Import the new nav bar
+
+// The home page now manages the state for the selected navigation item.
+class EcoGamesHomePage extends StatefulWidget {
   const EcoGamesHomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Set the status bar style to match the app's theme
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ));
+  State<EcoGamesHomePage> createState() => _EcoGamesHomePageState();
+}
 
+class _EcoGamesHomePageState extends State<EcoGamesHomePage> {
+  var _contentKey = UniqueKey();
+  int _selectedIndex = 0; // State for the selected navigation item
+
+  Future<void> _handleRefresh() async {
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) {
+      setState(() {
+        _contentKey = UniqueKey();
+      });
+    }
+  }
+
+  // Callback function to handle navigation bar item taps
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    // TODO: Add navigation logic here based on the index
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5), // A light, earthy background
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          children: const [
-            SizedBox(height: 20),
-            // -- Header Section --
-            HeaderSection(),
-            SizedBox(height: 30),
-            // -- User Profile Card --
-            UserProfileCard(),
-            SizedBox(height: 30),
-            // -- Eco Challenges Section --
-            SectionTitle(title: 'Your Eco-Challenges'),
-            SizedBox(height: 20),
-            ChallengesGrid(),
-            SizedBox(height: 30),
-            // -- Daily Tip Section --
-            SectionTitle(title: 'Fact of the Day'),
-            SizedBox(height: 20),
-            DailyTipCard(),
-            SizedBox(height: 40),
-          ],
-        ),
+      backgroundColor: const Color(0xFFF0F4F0),
+      // The body is now a Stack to layer the content and the navigation bar.
+      body: Stack(
+        children: [
+          SafeArea(
+            child: LiquidPullToRefresh(
+              onRefresh: _handleRefresh,
+              color: const Color(0xFF2E7D32),
+              backgroundColor: Colors.white,
+              height: 100,
+              animSpeedFactor: 2.0,
+              showChildOpacityTransition: false,
+              child: ListView(
+                key: _contentKey,
+                // Add padding to the bottom to prevent content from being hidden
+                // behind the navigation bar.
+                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 100.0),
+                children: const [
+                  HeaderSection(),
+                  SizedBox(height: 20),
+                  UserProfileCard(),
+                  SizedBox(height: 30),
+                  SectionTitle(title: 'Weekly Challenges'),
+                  SizedBox(height: 15),
+                  ChallengesGrid(),
+                  SizedBox(height: 30),
+                  SectionTitle(title: 'Daily Eco-Tip'),
+                  SizedBox(height: 15),
+                  DailyTipCard(),
+                ],
+              ),
+            ),
+          ),
+          // Position the floating navigation bar at the bottom of the screen.
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: FloatingNavBar(
+              selectedIndex: _selectedIndex,
+              onItemTapped: _onItemTapped,
+            ),
+          ),
+        ],
       ),
     );
   }
