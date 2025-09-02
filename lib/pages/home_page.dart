@@ -6,7 +6,9 @@ import '../widgets/challenges_grid.dart';
 import '../widgets/header_section.dart';
 import '../widgets/section_title.dart';
 import '../widgets/user_profile_card.dart';
-import '../widgets/floating_nav_bar.dart'; // Import the new nav bar
+import '../widgets/floating_nav_bar.dart';
+import './profile_page.dart'; // Import the new profile page
+import './settings_page.dart'; // Import the new settings page
 
 // The home page now manages the state for the selected navigation item.
 class EcoGamesHomePage extends StatefulWidget {
@@ -29,19 +31,37 @@ class _EcoGamesHomePageState extends State<EcoGamesHomePage> {
     }
   }
 
-  // Callback function to handle navigation bar item taps
+  // This function handles the tap events and navigates to the correct page.
   void _onItemTapped(int index) {
+    // Only navigate if a new item is selected
+    if (_selectedIndex == index) return;
+
     setState(() {
       _selectedIndex = index;
     });
-    // TODO: Add navigation logic here based on the index
+
+    // Handle navigation to other pages
+    switch (index) {
+      case 2: // Profile
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ProfilePage()),
+        ).then((_) => setState(() => _selectedIndex = 0)); // Reset index when returning
+        break;
+      case 3: // Settings
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SettingsPage()),
+        ).then((_) => setState(() => _selectedIndex = 0)); // Reset index when returning
+        break;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4F0),
-      // The body is now a Stack to layer the content and the navigation bar.
+      // The body is a Stack to layer the content and the navigation bar.
       body: Stack(
         children: [
           SafeArea(
