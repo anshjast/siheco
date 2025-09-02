@@ -15,7 +15,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    Timer(const Duration(seconds: 5), () {
+    Timer(const Duration(milliseconds: 4500), () {
       if (mounted) {
         // CORRECTED: Navigate to the LoginScreen, not the HomeScreen
         Navigator.of(context).pushReplacement(

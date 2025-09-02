@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project/pages/home_page.dart';
 import '../main.dart'; // For navigation to HomeScreen
 
 class LoginScreen extends StatefulWidget {
@@ -160,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (_) => const HomeScreen()),
+                        MaterialPageRoute(builder: (_) => const EcoGamesHomePage()),
                       );
                     },
                     style: ElevatedButton.styleFrom(
