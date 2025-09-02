@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Import for haptic feedback
 import 'dart:ui';
 
 // A reusable floating navigation bar with an expanding "pill" animation.
@@ -87,14 +86,9 @@ class FloatingNavBar extends StatelessWidget {
   }
 
   // Helper widget to build each individual navigation button.
-  Widget _buildNavItem(
-      IconData icon, String label, int index, bool isSelected) {
+  Widget _buildNavItem(IconData icon, String label, int index, bool isSelected) {
     return GestureDetector(
-      onTap: () {
-        // Add haptic feedback for a more tactile feel
-        HapticFeedback.lightImpact();
-        onItemTapped(index);
-      },
+      onTap: () => onItemTapped(index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeOut,
@@ -102,8 +96,7 @@ class FloatingNavBar extends StatelessWidget {
         decoration: BoxDecoration(
           // A more complex decoration with shadows creates an "emboss" effect
           // on the selected item.
-          color:
-          isSelected ? Colors.lightGreen.withOpacity(0.3) : Colors.transparent,
+          color: isSelected ? Colors.lightGreen.withOpacity(0.3) : Colors.transparent,
           borderRadius: BorderRadius.circular(30),
           boxShadow: isSelected
               ? [
