@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:animate_do/animate_do.dart';
+import 'package:project/pages/home_page.dart';
 import 'login_page.dart'; // CORRECTED: Import the login page
 
 class SplashScreen extends StatefulWidget {
@@ -19,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (mounted) {
         // CORRECTED: Navigate to the LoginScreen, not the HomeScreen
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          MaterialPageRoute(builder: (_) => const EcoGamesHomePage()),
         );
       }
     });

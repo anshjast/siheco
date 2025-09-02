@@ -33,7 +33,7 @@ class HeaderSection extends StatelessWidget {
         CircleAvatar(
           radius: 30,
           backgroundImage: const NetworkImage(
-              'https://placehold.co/120x120/A9DFBF/2E7D32?text=AG'),
+              'https://dummyimage.com/360x360/a9dfbe/767676&text=AG'),
           onBackgroundImageError: (exception, stackTrace) {
             // Handle error, maybe show a default icon
           },
