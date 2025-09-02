@@ -46,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 delay: const Duration(milliseconds: 1000), // Adjusted delay
                 duration: const Duration(milliseconds: 1500),
                 child: Text(
-                  'EcoGames',
+                  'EcoGames Environmaents',
                   style: TextStyle(
                     fontFamily: 'Lato',
                     fontSize: 42,
