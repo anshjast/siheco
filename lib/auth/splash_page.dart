@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:animate_do/animate_do.dart';
-import 'package:project/pages/home_page.dart';
-import 'login_page.dart'; // CORRECTED: Import the login page
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,15 +13,37 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    _initializeApp();
+  }
 
-    Timer(const Duration(milliseconds: 4500), () {
-      if (mounted) {
-        // CORRECTED: Navigate to the LoginScreen, not the HomeScreen
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
-        );
-      }
-    });
+  Future<void> _initializeApp() async {
+    // Wait for the authentication check and a minimum display time to complete.
+    final isLoggedIn = await _checkAuthStatus();
+
+    // Ensure the widget is still mounted before navigating.
+    if (!mounted) return;
+
+    if (isLoggedIn) {
+      // If logged in, go to the main app shell.
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      // If not logged in, go to the login screen.
+      Navigator.pushReplacementNamed(context, '/login');
+    }
+  }
+
+  /// Simulates checking the user's authentication status.
+  Future<bool> _checkAuthStatus() async {
+    // This is a placeholder for your actual authentication logic.
+    // You might check SharedPreferences, a secure token, or Firebase Auth.
+    //
+    // For this example, we'll wait for 3 seconds to ensure animations play,
+    // and we'll return 'false' to simulate a user who needs to log in.
+    await Future.delayed(const Duration(seconds: 3));
+
+    // TO-DO: Replace 'false' with your actual login check.
+    // For example: return FirebaseAuth.instance.currentUser != null;
+    return false;
   }
 
   @override
@@ -38,12 +58,11 @@ class _SplashScreenState extends State<SplashScreen> {
               SizedBox(
                 width: 200,
                 height: 200,
-                // CORRECTED: Asset path for gifs
                 child: Image.asset('assets/images/sapling.gif'),
               ),
               const SizedBox(height: 24),
               FadeInUp(
-                delay: const Duration(milliseconds: 1000),
+                delay: const Duration(milliseconds: 500),
                 duration: const Duration(milliseconds: 1500),
                 child: Text(
                   'EcoGames',
@@ -56,7 +75,6 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 120),
             ],
           ),
         ),
@@ -64,4 +82,3 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-

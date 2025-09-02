@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'auth/splash_page.dart';
-import 'auth/login_page.dart'; // Re-import the login page
-import 'pages/home_page.dart';
+import 'auth/login_page.dart';
+// Import the new AppShell
+import 'pages/app_shell.dart';
 
 void main() {
   runApp(const EcoGamesApp());
@@ -19,14 +20,12 @@ class EcoGamesApp extends StatelessWidget {
         fontFamily: 'Poppins',
       ),
       debugShowCheckedModeBanner: false,
-      // The app starts with the splash screen.
       home: const SplashScreen(),
-      // Define the routes for navigation
       routes: {
         '/login': (context) => const LoginScreen(),
-        '/home': (context) => const EcoGamesHomePage(),
+        // Point the '/home' route to the new AppShell
+        '/home': (context) => const AppShell(),
       },
     );
   }
 }
-

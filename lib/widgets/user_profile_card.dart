@@ -193,8 +193,8 @@ class _UserProfileCardState extends State<UserProfileCard>
 
                 // Define new badge sizes
                 const double unachievedSize = 20.0; // Changed initial size
-                const double achievedSize = 35.0;
-                const double peakSize = 45.0;
+                const double achievedSize = 40.0;
+                const double peakSize = 50.0;
 
                 // Determine the target size for the animation
                 final double iconSize;
