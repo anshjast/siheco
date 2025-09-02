@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-// A reusable floating navigation bar with an expanding "pill" animation.
-class FloatingNavBar extends StatelessWidget {
+class FloatingNavBar extends StatefulWidget {
   final int selectedIndex;
   final Function(int) onItemTapped;
 
@@ -12,104 +13,118 @@ class FloatingNavBar extends StatelessWidget {
     required this.onItemTapped,
   });
 
-  // A helper list to define the navigation items
+  @override
+  State<FloatingNavBar> createState() => _FloatingNavBarState();
+}
+
+class _FloatingNavBarState extends State<FloatingNavBar> {
+  // A helper list to define the new navigation items
   static const List<_NavBarItem> _items = [
     _NavBarItem(icon: Icons.home_rounded, label: 'Home'),
-    _NavBarItem(icon: Icons.games_rounded, label: 'Games'),
+    _NavBarItem(icon: CupertinoIcons.flame_fill, label: 'Challenges'),
+    _NavBarItem(icon: Icons.people_rounded, label: 'Community'),
+    _NavBarItem(icon: Icons.leaderboard_rounded, label: 'Leaderboard'),
     _NavBarItem(icon: Icons.person_rounded, label: 'Profile'),
-    _NavBarItem(icon: Icons.settings_rounded, label: 'Settings'),
-  ];
-
-  // A list of alignments to position the background gradient
-  static const List<Alignment> _gradientAlignments = [
-    Alignment(-0.85, 0),
-    Alignment(-0.28, 0),
-    Alignment(0.28, 0),
-    Alignment(0.85, 0),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      // Reduced horizontal padding to make the bar wider
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 20.0),
-      // This outer Container adds the drop shadow for a 3D effect.
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(50.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.green.withOpacity(0.3),
-              blurRadius: 20,
-              spreadRadius: 2,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(50.0), // Fully rounded ends
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.easeInOut,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              decoration: BoxDecoration(
-                // The RadialGradient is now more focused, creating a "glow"
-                // that follows the selection.
-                gradient: RadialGradient(
-                  center: _gradientAlignments[selectedIndex],
-                  radius: 1.0, // Reduced radius for a tighter glow
-                  colors: [
-                    Colors.lightGreen.withOpacity(0.4),
-                    Colors.green.withOpacity(0.0),
-                  ],
-                  stops: const [0.0, 0.8], // Sharpens the gradient's edge
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        Positioned(
+          bottom: 20,
+          left: 20,
+          right: 20,
+          // This outer Container adds the drop shadow for the 3D effect.
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.green.withOpacity(0.3),
+                  blurRadius: 20,
+                  spreadRadius: -5,
+                  offset: const Offset(0, 10),
                 ),
-                borderRadius: BorderRadius.circular(50.0),
-                border: Border.all(color: Colors.white.withOpacity(0.2)),
-              ),
-              child: Row(
-                // Distribute the items evenly across the wider bar
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.generate(_items.length, (index) {
-                  final item = _items[index];
-                  final bool isSelected = selectedIndex == index;
-                  return _buildNavItem(item.icon, item.label, index, isSelected);
-                }),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                child: Container(
+                  height: 70,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor.withOpacity(0.75),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                      color: Theme.of(context).dividerColor.withOpacity(0.2),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: List.generate(_items.length, (index) {
+                      final item = _items[index];
+                      return _buildBottomNavItem(
+                        context,
+                        index,
+                        item.icon,
+                        item.label,
+                      );
+                    }),
+                  ),
+                ),
               ),
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 
-  // Helper widget to build each individual navigation button.
-  Widget _buildNavItem(IconData icon, String label, int index, bool isSelected) {
+  Widget _buildBottomNavItem(
+      BuildContext context,
+      int index,
+      IconData icon,
+      String label,
+      ) {
+    final bool isActive = widget.selectedIndex == index;
+
+    final color = isActive
+        ? Colors.green
+        : Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7);
+
     return GestureDetector(
-      onTap: () => onItemTapped(index),
+      onTap: () {
+        HapticFeedback.lightImpact();
+        widget.onItemTapped(index);
+      },
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 350),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        // *** FIX: Reduced widths to prevent overflow with five items ***
+        width: isActive ? 100 : 50,
+        height: 50,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
-          // A more complex decoration with shadows creates an "emboss" effect
-          // on the selected item.
-          color: isSelected ? Colors.lightGreen.withOpacity(0.3) : Colors.transparent,
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: isSelected
+          color: isActive
+              ? Colors.yellow.withOpacity(0.50)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: isActive
               ? [
             // Top-left highlight for the emboss effect
             BoxShadow(
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withOpacity(0.8),
               blurRadius: 5,
               spreadRadius: 1,
               offset: const Offset(-2, -2),
             ),
             // Bottom-right shadow for the emboss effect
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withOpacity(0.3),
               blurRadius: 5,
               spreadRadius: 1,
               offset: const Offset(2, 2),
@@ -118,35 +133,30 @@ class FloatingNavBar extends StatelessWidget {
               : [],
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: isSelected
-                  ? const Color(0xFF1B5E20) // Darker green for selected icon
-                  : Colors.black.withOpacity(0.5),
-              size: 24,
-            ),
-            // The AnimatedSize and ClipRect widgets create the smooth
-            // expanding and collapsing effect for the text label.
-            AnimatedSize(
-              duration: const Duration(milliseconds: 350),
-              curve: Curves.easeInOut,
-              child: ClipRect(
-                child: isSelected
-                    ? Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
+            Icon(icon, color: color, size: 28),
+            if (isActive) ...[
+              const SizedBox(width: 4),
+              Flexible(
+                child: AnimatedOpacity(
+                  opacity: isActive ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 200),
                   child: Text(
                     label,
-                    style: const TextStyle(
-                      color: Color(0xFF1B5E20), // Darker green for text
+                    style: TextStyle(
+                      color: color,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                     ),
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.clip,
                   ),
-                )
-                    : const SizedBox.shrink(),
+                ),
               ),
-            ),
+            ]
           ],
         ),
       ),
@@ -161,4 +171,3 @@ class _NavBarItem {
 
   const _NavBarItem({required this.icon, required this.label});
 }
-
