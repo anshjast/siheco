@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (mounted) {
         // CORRECTED: Navigate to the LoginScreen, not the HomeScreen
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const EcoGamesHomePage()),
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
         );
       }
     });
