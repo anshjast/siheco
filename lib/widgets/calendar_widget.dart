@@ -20,6 +20,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     DateTime(2025, 8, 31),
     DateTime(2025, 9, 1),
     DateTime(2025, 9, 2),
+    DateTime(2025, 9, 3),
+
 
     // To make today part of the streak for testing, uncomment the next line
     // DateTime.now(),

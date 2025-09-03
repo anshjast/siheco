@@ -22,7 +22,7 @@ class _FloatingNavBarState extends State<FloatingNavBar> {
   static const List<_NavBarItem> _items = [
     _NavBarItem(icon: Icons.home_rounded, label: 'Home'),
     _NavBarItem(icon: Icons.menu_book, label: 'Lessons'),
-    //_NavBarItem(icon: Icons.people_rounded, label: 'Community'),
+    _NavBarItem(icon: Icons.people_rounded, label: 'Community'),
     _NavBarItem(icon: Icons.leaderboard_rounded, label: 'Leaderboard'),
     _NavBarItem(icon: Icons.person_rounded, label: 'Profile'),
   ];
