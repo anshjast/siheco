@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 15),
             ChallengesWidget(),
             SizedBox(height: 30),
-            SectionTitle(title: 'Daily Eco-Tip'),
+            SectionTitle(title: 'Daily Eco-points'),
             SizedBox(height: 15),
             DailyTipCard(),
           ],
