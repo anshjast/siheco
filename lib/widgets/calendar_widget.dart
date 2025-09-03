@@ -21,10 +21,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     DateTime(2025, 9, 1),
     DateTime(2025, 9, 2),
     DateTime(2025, 9, 3),
-
-
-    // To make today part of the streak for testing, uncomment the next line
-    // DateTime.now(),
+    DateTime(2025, 9, 4),
   };
 
   @override
@@ -173,6 +170,9 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         final hasStreak =
         _streakDates.any((d) => DateUtils.isSameDay(d, date));
 
+        // --- A streak day is only highlighted if it is also today ---
+        final isHighlightedStreak = hasStreak && isToday;
+
         return GestureDetector(
           onTap: () {
             setState(() {
@@ -190,7 +190,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
               if (hasStreak && !isSelected)
                 Icon(
                   Icons.eco_outlined,
-                  color: Colors.green.withOpacity(0.4),
+                  // --- Updated: Leaf is now always green if part of a streak ---
+                  color: Colors.green.withOpacity(0.5),
                   size: 36,
                 ),
               AnimatedContainer(
@@ -198,7 +199,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? const Color(0xFF4CAF50)
-                      : (isToday
+                      : (isHighlightedStreak // Only highlight if it's a streak on today's date
                       ? const Color(0xFFB5E0B7)
                       : Colors.transparent),
                   borderRadius: BorderRadius.circular(12),
@@ -222,8 +223,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                           blurRadius: 5,
                         ),
                       ],
-                    // --- Add a green glow for streak days ---
-                    if (hasStreak && !isSelected)
+                    // --- Add a green glow for the highlighted streak day ---
+                    if (isHighlightedStreak && !isSelected)
                       BoxShadow(
                         color: Colors.green.withOpacity(0.6),
                         blurRadius: 8.0,
