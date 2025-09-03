@@ -22,7 +22,7 @@ class _AppShellState extends State<AppShell> {
   static const List<Widget> _pages = <Widget>[
     HomePage(),
     LessonsPage(), 
-    //CommunityPage(),
+    CommunityPage(),
     LeaderboardPage(),
     ProfilePage(),
   ];
