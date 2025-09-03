@@ -5,11 +5,11 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // CRITICAL: No Scaffold here!
-    return const SafeArea(
-      child: Center(
+    return const Scaffold(
+      backgroundColor: Color(0xFFF0F4F0),
+      body: Center(
         child: Text(
-          'Profile Page Content',
+          'Profile Page',
           style: TextStyle(fontSize: 24),
         ),
       ),

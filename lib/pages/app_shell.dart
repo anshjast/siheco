@@ -3,7 +3,7 @@ import '../widgets/floating_nav_bar.dart';
 
 // Import all of your page widgets
 import './home_page.dart';
-import './challenges_page.dart';
+import './lessons_page.dart';
 import './community_page.dart';
 import './leaderboard_page.dart';
 import './profile_page.dart';
@@ -21,8 +21,8 @@ class _AppShellState extends State<AppShell> {
   // This list now contains your actual page widgets
   static const List<Widget> _pages = <Widget>[
     HomePage(),
-    ChallengesPage(),
-    CommunityPage(),
+    LessonsPage(), 
+    //CommunityPage(),
     LeaderboardPage(),
     ProfilePage(),
   ];

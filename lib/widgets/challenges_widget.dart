@@ -39,7 +39,7 @@ class ChallengesWidget extends StatelessWidget {
       children: [
         // --- Professional looking section title ---
         SizedBox(
-          height: 200, // Reduced height for smaller tiles
+          height: 220, // Reduced height for smaller tiles
           child: PageView.builder(
             controller: PageController(
               viewportFraction: 0.85, // Slightly adjusted for a better look
