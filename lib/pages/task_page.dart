@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../models/course.dart'; // <-- CHANGE 1: Import the full Course model
-import '../widgets/reward_dialog.dart'; // <-- CHANGE 2: Import the new RewardDialog widget
+import '../models/course.dart';
+import '../widgets/reward_dialog.dart';
 
 class TaskPage extends StatefulWidget {
-  final Course course; // <-- CHANGE 3: Accept the full Course object now
+  final Course course;
   final VoidCallback onTaskComplete;
 
   const TaskPage({
@@ -32,27 +32,25 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   void _submitTask() {
-    // --- CHANGE 4: This is the most important change! ---
-    // Instead of a simple SnackBar, we now show our custom RewardDialog.
     showDialog(
       context: context,
-      barrierDismissible: false, // User must interact with the dialog to close it
+      barrierDismissible: false,
       builder: (_) => RewardDialog(
         title: widget.course.badgeName,
         xp: widget.course.xp,
         coins: widget.course.coins,
-        badgeIcon: widget.course.badgeIcon,
+        // --- THE FIX IS HERE ---
+        // We now pass the correct 'badgeAsset' parameter with the image path.
+        badgeAsset: widget.course.badgeAsset,
       ),
     ).then((_) {
-      // This part of the code runs AFTER the user taps "Continue" on the dialog.
-      widget.onTaskComplete(); // This unlocks the next course on the previous page.
-      Navigator.of(context).pop(); // This takes the user back to the Course Hub page.
+      widget.onTaskComplete();
+      Navigator.of(context).pop();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // In a real app, this task info would also come from the Course object.
     const taskInstructions =
         "1. Find two containers for your home.\n2. Label one 'Wet Waste' and the other 'Dry Waste'.\n3. Put all your waste into the correct bin for 24 hours.";
     const submissionRequirement =
@@ -60,7 +58,6 @@ class _TaskPageState extends State<TaskPage> {
 
     return Scaffold(
       appBar: AppBar(
-        // The AppBar title now uses the actual course title.
         title: Text(widget.course.title),
         backgroundColor: const Color(0xFF56ab2f),
       ),
