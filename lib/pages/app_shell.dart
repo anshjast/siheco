@@ -18,13 +18,13 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int _selectedIndex = 0;
 
-  // This list now contains your actual page widgets
-  static const List<Widget> _pages = <Widget>[
-    HomePage(),
-    LessonsPage(), 
-    //CommunityPage(),
-    LeaderboardPage(),
-    ProfilePage(),
+  // Removed `const` here because the widgets might not be constant constructors
+  static final List<Widget> _pages = <Widget>[
+    const HomePage(),
+    const LessonsPage(),
+    // const CommunityPage(),
+    const LeaderboardPage(),
+    const ProfilePage(),
   ];
 
   void _onItemTapped(int index) {
