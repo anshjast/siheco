@@ -9,7 +9,8 @@ class Course {
   final IconData icon;
   final Color color;
   final String badgeName;
-  final IconData badgeIcon;
+  final String badgeAsset;
+
   const Course({
     required this.id,
     required this.title,
@@ -19,7 +20,7 @@ class Course {
     required this.icon,
     required this.color,
     required this.badgeName,
-    required this.badgeIcon,
+    required this.badgeAsset,
   });
 }
 

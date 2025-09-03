@@ -13,7 +13,8 @@ class _LessonsPageState extends State<LessonsPage> {
   int userProgressLevel = 0;
 
   // --- THIS IS THE MAIN CHANGE FOR STEP 2 ---
-  // We are adding the new badgeName and badgeIcon to each course.
+  // We are updating each course to use the new 'badgeAsset' property
+  // with the correct image path.
   final List<Course> courses = const [
     Course(
       id: 'c1',
@@ -23,8 +24,8 @@ class _LessonsPageState extends State<LessonsPage> {
       coins: 50,
       icon: Icons.recycling,
       color: Colors.green,
-      badgeName: 'Waste Warrior', // <-- NEW
-      badgeIcon: Icons.shield,   // <-- NEW
+      badgeName: 'Waste Warrior',
+      badgeAsset: 'assets/images/badge_waste.png', // <-- CHANGED
     ),
     Course(
       id: 'c2',
@@ -34,8 +35,8 @@ class _LessonsPageState extends State<LessonsPage> {
       coins: 60,
       icon: Icons.water_drop,
       color: Colors.blue,
-      badgeName: 'Water Guardian', // <-- NEW
-      badgeIcon: Icons.opacity,      // <-- NEW
+      badgeName: 'Water Guardian',
+      badgeAsset: 'assets/images/badge_water.png', // <-- CHANGED
     ),
     Course(
       id: 'c3',
@@ -45,8 +46,8 @@ class _LessonsPageState extends State<LessonsPage> {
       coins: 60,
       icon: Icons.power_off,
       color: Colors.amber,
-      badgeName: 'Energy Wiz',      // <-- NEW
-      badgeIcon: Icons.flash_on,    // <-- NEW
+      badgeName: 'Energy Wiz',
+      badgeAsset: 'assets/images/badge_energy.png', // <-- CHANGED
     ),
   ];
 
