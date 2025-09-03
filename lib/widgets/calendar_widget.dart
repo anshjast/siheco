@@ -15,9 +15,12 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   // --- You can easily add or change the streak dates here ---
   // Note: The time of day is ignored, only the date matters.
   final Set<DateTime> _streakDates = {
+    DateTime(2025, 8, 29),
     DateTime(2025, 8, 30),
     DateTime(2025, 8, 31),
     DateTime(2025, 9, 1),
+    DateTime(2025, 9, 2),
+
     // To make today part of the streak for testing, uncomment the next line
     // DateTime.now(),
   };
