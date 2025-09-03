@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 
+// This is the blueprint for your beautiful reward pop-up.
+// It's designed to be reusable for any course completion.
 class RewardDialog extends StatelessWidget {
   final String title;
   final int xp;
   final int coins;
-  final IconData badgeIcon;
+  final String badgeAsset; // It now correctly expects a String path for the image
 
   const RewardDialog({
     super.key,
     required this.title,
     required this.xp,
     required this.coins,
-    required this.badgeIcon,
+    required this.badgeAsset,
   });
 
   @override
@@ -21,14 +23,17 @@ class RewardDialog extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.min, // Make the dialog wrap its content
           children: [
             const Text(
               '🎉 Congratulations! 🎉',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            Icon(badgeIcon, color: Colors.amber, size: 80),
+            // --- THE MAIN FIX IS HERE ---
+            // We now use Image.asset to display your beautiful custom badge
+            // from the path you provided in lessons_page.dart.
+            Image.asset(badgeAsset, height: 100, width: 100),
             const SizedBox(height: 16),
             Text(
               'You are now a\n$title!',
@@ -57,7 +62,7 @@ class RewardDialog extends StatelessWidget {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
               ),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(context).pop(), // Closes the dialog
               child: const Text('Continue', style: TextStyle(fontSize: 18)),
             ),
           ],
@@ -66,6 +71,7 @@ class RewardDialog extends StatelessWidget {
     );
   }
 
+  // A helper widget to create the styled reward chips.
   Widget _buildRewardChip(String label, Color color) {
     return Chip(
       label: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
@@ -74,3 +80,4 @@ class RewardDialog extends StatelessWidget {
     );
   }
 }
+
