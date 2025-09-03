@@ -18,12 +18,12 @@ class ChallengesWidget extends StatelessWidget {
         'description': 'Become a hero—every drop counts, from showers to sinks.'
       },
       {
-        'icon': 'assets/images/energy.png', // Replace with your actual file name
+        'icon': 'assets/images/trophy.png', // Replace with your actual file name
         'title': 'Energy Wiz',
         'description': 'Vanquish energy vampires by unplugging unused devices.'
       },
       {
-        'icon': 'assets/images/shopping_bag.png', // Replace with your actual file name
+        'icon': 'assets/images/trophy.png', // Replace with your actual file name
         'title': 'Waste Less',
         'description': 'Embrace mindful consumption and choose reusables.'
       },
@@ -38,20 +38,8 @@ class ChallengesWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // --- Professional looking section title ---
-        const Padding(
-          padding: EdgeInsets.only(left: 25.0, top: 10.0, bottom: 5.0),
-          child: Text(
-            'Weekly Challenges',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF3D4C5E),
-              fontFamily: 'Inter',
-            ),
-          ),
-        ),
         SizedBox(
-          height: 250, // Increased height to fit the description
+          height: 200, // Reduced height for smaller tiles
           child: PageView.builder(
             controller: PageController(
               viewportFraction: 0.85, // Slightly adjusted for a better look
@@ -62,8 +50,8 @@ class ChallengesWidget extends StatelessWidget {
               return Container(
                 // Padding between the carousel cards
                 margin:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                padding: const EdgeInsets.all(20), // Added internal padding
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                padding: const EdgeInsets.all(15), // Reduced internal padding
                 // --- This decoration creates a softer 3D emboss effect ---
                 decoration: BoxDecoration(
                   color: neumorphicBaseColor,
@@ -89,28 +77,28 @@ class ChallengesWidget extends StatelessWidget {
                     // --- Use Image.asset to display the PNG icon ---
                     Image.asset(
                       challenge['icon'] as String,
-                      height: 65,
-                      width: 65,
+                      height: 70, // Reduced image size
+                      width: 70, // Reduced image size
                     ),
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 10), // Adjusted spacing
                     // --- Title with updated styling ---
                     Text(
                       challenge['title'] as String,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        fontSize: 20,
+                        fontSize: 18, // Reduced font size
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF333333),
                         fontFamily: 'Inter',
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4), // Reduced spacing for compact text
                     // --- Added description text ---
                     Text(
                       challenge['description'] as String,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13, // Reduced font size
                         fontWeight: FontWeight.w500,
                         color: Colors.blueGrey[700],
                         fontFamily: 'Inter',
