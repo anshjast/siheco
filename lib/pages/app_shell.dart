@@ -21,8 +21,8 @@ class _AppShellState extends State<AppShell> {
   // This list now contains your actual page widgets
   static const List<Widget> _pages = <Widget>[
     HomePage(),
-    LessonsPage(),
-    CommunityPage(),
+    LessonsPage(), 
+    //CommunityPage(),
     LeaderboardPage(),
     ProfilePage(),
   ];
