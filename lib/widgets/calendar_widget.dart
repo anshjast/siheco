@@ -18,9 +18,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     DateTime(2025, 8, 30),
     DateTime(2025, 8, 31),
     DateTime(2025, 9, 1),
-    DateTime(2025, 9, 2),
-    DateTime(2025, 9, 3),
-
     // To make today part of the streak for testing, uncomment the next line
     // DateTime.now(),
   };
@@ -55,14 +52,14 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     return streakCount;
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(20),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        // --- Reduced vertical padding for a more compact UI ---
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFFF0F4F8), Color(0xFFD9E2EC)],
@@ -78,18 +75,20 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             ),
           ],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildHeader(),
-            const SizedBox(height: 20),
-            _buildWeekdays(),
-            const SizedBox(height: 10),
-            _buildCalendarGrid(),
-            const SizedBox(height: 20),
-            // --- Added streak counter display ---
-            _buildStreakCounter(),
-          ],
+        // --- Added SingleChildScrollView to prevent overflow on smaller screens ---
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildHeader(),
+              const SizedBox(height: 15), // Reduced spacing
+              _buildWeekdays(),
+              const SizedBox(height: 10),
+              _buildCalendarGrid(),
+              const SizedBox(height: 15), // Reduced spacing
+              _buildStreakCounter(),
+            ],
+          ),
         ),
       ),
     );
@@ -141,7 +140,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   Widget _buildCalendarGrid() {
     final daysInMonth =
     DateUtils.getDaysInMonth(_currentMonth.year, _currentMonth.month);
-    final firstDayOfMonth = DateTime(_currentMonth.year, _currentMonth.month, 1);
+    final firstDayOfMonth =
+    DateTime(_currentMonth.year, _currentMonth.month, 1);
     final startingWeekday = firstDayOfMonth.weekday; // Monday = 1, Sunday = 7
 
     return GridView.builder(
@@ -149,7 +149,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 7,
-        childAspectRatio: 1.1,
+        // --- Made the cells square for a more compact grid ---
+        childAspectRatio: 1.0,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
       ),
@@ -164,7 +165,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         final isSelected = DateUtils.isSameDay(date, _selectedDate);
 
         // --- Check if the current date has a streak ---
-        final hasStreak = _streakDates.any((d) => DateUtils.isSameDay(d, date));
+        final hasStreak =
+        _streakDates.any((d) => DateUtils.isSameDay(d, date));
 
         return GestureDetector(
           onTap: () {
@@ -193,26 +195,36 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                       ? const Color(0xFF4CAF50)
                       : (isToday
                       ? const Color(0xFFB5E0B7)
-                      : Colors.transparent), // Made non-streak days transparent
+                      : Colors.transparent),
                   borderRadius: BorderRadius.circular(12),
-                  // Use a border for non-streak days to maintain the 3D look
-                  border: hasStreak || isSelected || isToday
+                  // --- No border for glowing or selected items ---
+                  border: (isSelected || hasStreak)
                       ? null
-                      : Border.all(color: const Color(0xFFD1D9E6), width: 2),
-                  boxShadow: isSelected
-                      ? [
-                    const BoxShadow(
-                      color: Color(0xFF388E3C),
-                      offset: Offset(3, 3),
-                      blurRadius: 5,
-                    ),
-                    const BoxShadow(
-                      color: Color(0xFF66BB6A),
-                      offset: Offset(-3, -3),
-                      blurRadius: 5,
-                    ),
-                  ]
-                      : [], // Removed shadow for non-selected days
+                      : Border.all(
+                      color: const Color(0xFFD1D9E6).withOpacity(0.8),
+                      width: 1.5),
+                  boxShadow: [
+                    if (isSelected)
+                      ...[
+                        const BoxShadow(
+                          color: Color(0xFF388E3C),
+                          offset: Offset(3, 3),
+                          blurRadius: 5,
+                        ),
+                        const BoxShadow(
+                          color: Color(0xFF66BB6A),
+                          offset: Offset(-3, -3),
+                          blurRadius: 5,
+                        ),
+                      ],
+                    // --- Add a green glow for streak days ---
+                    if (hasStreak && !isSelected)
+                      BoxShadow(
+                        color: Colors.green.withOpacity(0.6),
+                        blurRadius: 8.0,
+                        spreadRadius: 1.0,
+                      )
+                  ],
                 ),
                 child: Center(
                   child: Text(
@@ -254,8 +266,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
               offset: Offset(-2, -2),
               blurRadius: 5,
             ),
-          ]
-      ),
+          ]),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
