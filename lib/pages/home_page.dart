@@ -3,7 +3,7 @@ import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
 // Make sure these import paths match your project structure
 import '../widgets/daily_tip_card.dart';
-import '../widgets/challenges_grid.dart';
+import '../widgets/challenges_widget.dart';
 import '../widgets/header_section.dart';
 import '../widgets/section_title.dart';
 import '../widgets/user_profile_card.dart';
@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 30),
             SectionTitle(title: 'Weekly Challenges'),
             SizedBox(height: 15),
-            ChallengesGrid(),
+            ChallengesWidget(),
             SizedBox(height: 30),
             SectionTitle(title: 'Daily Eco-Tip'),
             SizedBox(height: 15),

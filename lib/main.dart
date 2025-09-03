@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'auth/splash_page.dart';
 import 'auth/login_page.dart';
-// Import the new AppShell
 import 'pages/app_shell.dart';
 
 void main() {

@@ -110,7 +110,7 @@ class _FloatingNavBarState extends State<FloatingNavBar> {
         padding: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
           color: isActive
-              ? Colors.yellow.withOpacity(0.50)
+              ? Colors.white.withOpacity(0.50)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(25),
           boxShadow: isActive

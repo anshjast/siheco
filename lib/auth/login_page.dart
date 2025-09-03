@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project/pages/app_shell.dart';
 import '../main.dart'; // For navigation to HomeScreen
+import 'signup_page.dart'; // Import the signup page
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -259,7 +260,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        // TODO: Navigate to Sign up screen
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const SignUpScreen()),
+                        );
                       },
                       child: const Text(
                         'Sign Up',
@@ -281,4 +284,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-

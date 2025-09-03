@@ -114,10 +114,6 @@ class _UserProfileCardState extends State<UserProfileCard>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'alex.green@ecoworld.com',
-            style: TextStyle(fontSize: 14, color: Colors.white70),
-          ),
           const SizedBox(height: 15),
           const Text(
             'In September...',
@@ -192,8 +188,8 @@ class _UserProfileCardState extends State<UserProfileCard>
                 final isPopping = _isPopping[points] ?? false;
 
                 // Define new badge sizes
-                const double unachievedSize = 20.0; // Changed initial size
-                const double achievedSize = 40.0;
+                const double unachievedSize = 18.0; // Changed initial size
+                const double achievedSize = 30.0;
                 const double peakSize = 50.0;
 
                 // Determine the target size for the animation
