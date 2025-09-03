@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/course.dart';
-import 'course_detail_page.dart'; // Import the new, detailed course page
+import 'course_hub_page.dart';
 
 class LessonsPage extends StatefulWidget {
   const LessonsPage({super.key});
@@ -10,10 +10,10 @@ class LessonsPage extends StatefulWidget {
 }
 
 class _LessonsPageState extends State<LessonsPage> {
-  // This variable tracks how many courses the user has completed.
-  // It's the "memory" of the page.
   int userProgressLevel = 0;
 
+  // --- THIS IS THE MAIN CHANGE FOR STEP 2 ---
+  // We are adding the new badgeName and badgeIcon to each course.
   final List<Course> courses = const [
     Course(
       id: 'c1',
@@ -23,6 +23,8 @@ class _LessonsPageState extends State<LessonsPage> {
       coins: 50,
       icon: Icons.recycling,
       color: Colors.green,
+      badgeName: 'Waste Warrior', // <-- NEW
+      badgeIcon: Icons.shield,   // <-- NEW
     ),
     Course(
       id: 'c2',
@@ -32,6 +34,8 @@ class _LessonsPageState extends State<LessonsPage> {
       coins: 60,
       icon: Icons.water_drop,
       color: Colors.blue,
+      badgeName: 'Water Guardian', // <-- NEW
+      badgeIcon: Icons.opacity,      // <-- NEW
     ),
     Course(
       id: 'c3',
@@ -41,6 +45,8 @@ class _LessonsPageState extends State<LessonsPage> {
       coins: 60,
       icon: Icons.power_off,
       color: Colors.amber,
+      badgeName: 'Energy Wiz',      // <-- NEW
+      badgeIcon: Icons.flash_on,    // <-- NEW
     ),
   ];
 
@@ -72,20 +78,14 @@ class _LessonsPageState extends State<LessonsPage> {
               ),
               child: InkWell(
                 onTap: isLocked
-                    ? null // If the course is locked, tapping does nothing.
+                    ? null
                     : () {
-                  // If unlocked, navigate to the detail page.
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => CourseDetailPage(
-                        courseTitle: course.title,
-                        // This is the crucial part: we pass a function
-                        // to the detail page. This function will be
-                        // called ONLY when the user completes the course.
-                        onComplete: () {
+                      builder: (context) => CourseHubPage(
+                        course: course,
+                        onCourseComplete: () {
                           setState(() {
-                            // This code runs when the user finishes the
-                            // course, unlocking the next one.
                             if (userProgressLevel == index) {
                               userProgressLevel++;
                             }

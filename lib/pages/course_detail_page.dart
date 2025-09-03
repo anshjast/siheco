@@ -1,31 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-// --- Data Models for the course content ---
-// (These are the same as before)
-class Lesson {
-  final String title;
-  final String content;
-  final String imageAsset;
+// --- 1. IMPORT the models from their proper files ---
+import '../models/lesson.dart';
+import '../models/quiz_question.dart';
+import '../models/final_task.dart';
 
-  Lesson({required this.title, required this.content, required this.imageAsset});
-}
-
-class QuizQuestion {
-  final String question;
-  final List<String> options;
-  final int correctAnswerIndex;
-
-  QuizQuestion({required this.question, required this.options, required this.correctAnswerIndex});
-}
-
-class FinalTask {
-  final String title;
-  final String instructions;
-  final String submissionRequirement;
-
-  FinalTask({required this.title, required this.instructions, required this.submissionRequirement});
-}
+// --- 2. THE OLD, DUPLICATE CLASS DEFINITIONS HAVE BEEN REMOVED FROM THIS FILE ---
 
 enum CourseView { lessons, quiz, task }
 
@@ -47,18 +28,19 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
   CourseView _currentView = CourseView.lessons;
   final PageController _pageController = PageController();
   int _currentPageIndex = 0;
+
   int _currentQuestionIndex = 0;
   int? _selectedAnswerIndex;
   final List<int?> _userAnswers = [];
   int _quizScore = 0;
 
-  // --- UPDATED & EXPANDED COURSE CONTENT ---
-
+  // --- Course Content ---
+  // This data is now using the imported models.
   final List<Lesson> _lessons = [
     Lesson(
       title: "The Problem with Piles",
       content: "Every day, our cities create mountains of trash called landfills. When all waste is mixed, it pollutes our soil, water, and air. But we have the power to change this!",
-      imageAsset: 'assets/images/piles.png', // You can create a new landfill image later
+      imageAsset: 'assets/images/piles.png',
     ),
     Lesson(
       title: "What is 'Geela Kachra' (Wet Waste)?",
@@ -78,32 +60,32 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
     Lesson(
       title: "The Journey of Your Jars",
       content: "When you segregate, wet waste becomes compost for farms, and dry waste goes to recycling centers to become new products. You're not just throwing away trash, you're creating resources!",
-      imageAsset: 'assets/images/dustbin.png', // You can create a new recycling factory image
+      imageAsset: 'assets/images/dry_waste.png',
     ),
   ];
 
   final List<QuizQuestion> _quizQuestions = [
-    QuizQuestion(
+    const QuizQuestion(
       question: "What is the main problem with mixing all waste together in landfills?",
       options: ["It smells bad", "It pollutes soil, water, and air", "It looks ugly"],
       correctAnswerIndex: 1,
     ),
-    QuizQuestion(
+    const QuizQuestion(
       question: "An old newspaper belongs in which category?",
       options: ["Wet Waste", "Dry Waste", "Hazardous Waste"],
       correctAnswerIndex: 1,
     ),
-    QuizQuestion(
+    const QuizQuestion(
       question: "What is the superpower of Wet Waste?",
       options: ["It can be recycled", "It can be composted", "It is very strong"],
       correctAnswerIndex: 1,
     ),
-    QuizQuestion(
+    const QuizQuestion(
       question: "An expired bottle of medicine is an example of...",
       options: ["Wet Waste", "Dry Waste", "Hazardous Waste"],
       correctAnswerIndex: 2,
     ),
-    QuizQuestion(
+    const QuizQuestion(
       question: "What happens to properly segregated dry waste?",
       options: ["It is burned", "It goes to recycling centers", "It is buried"],
       correctAnswerIndex: 1,
@@ -117,13 +99,15 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
   );
 
   // --- All the methods below are the same as before ---
-  // (initState, buildLessonsView, buildQuizView, buildTaskView, etc.)
 
   @override
   void initState() {
     super.initState();
     _userAnswers.addAll(List.generate(_quizQuestions.length, (index) => null));
   }
+
+  // ... (The rest of your build methods like _buildLessonsView, _buildQuizView, etc., remain exactly the same) ...
+  // --- All the methods below are the same as before ---
 
   Widget _buildLessonsView() {
     return Column(
@@ -256,7 +240,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              if (_quizScore >= 3) { // Passing score adjusted for 5 questions
+              if (_quizScore >= 3) {
                 setState(() => _currentView = CourseView.task);
               } else {
                 _resetQuiz();
