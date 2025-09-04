@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:project/pages/app_shell.dart';
-import '../main.dart'; // For navigation to HomeScreen
 import 'signup_page.dart'; // Import the signup page
 
 class LoginScreen extends StatefulWidget {
@@ -141,7 +139,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       // TODO: Implement Forgot Password action
                     },
                     style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero, minimumSize: const Size(50, 30)),
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(50, 30)),
                     child: const Text(
                       'Forgot Password?',
                       style: TextStyle(
@@ -161,9 +160,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 52,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (_) => const AppShell()),
-                      );
+                      // ✅ Use named route for consistency
+                      Navigator.pushReplacementNamed(context, '/home');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF06A906),
@@ -261,7 +259,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     GestureDetector(
                       onTap: () {
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const SignUpScreen()),
+                          MaterialPageRoute(
+                              builder: (_) => const SignUpScreen()),
                         );
                       },
                       child: const Text(
