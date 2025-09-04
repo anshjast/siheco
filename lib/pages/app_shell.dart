@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project/main.dart';
 import '../widgets/floating_nav_bar.dart';
 
 // Import all of your page widgets
@@ -18,10 +19,9 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int _selectedIndex = 0;
 
-  // This list now contains your actual page widgets
   static const List<Widget> _pages = <Widget>[
     HomePage(),
-    LessonsPage(), 
+    LessonsPage(),
     CommunityPage(),
     LeaderboardPage(),
     ProfilePage(),
@@ -33,9 +33,33 @@ class _AppShellState extends State<AppShell> {
     });
   }
 
+  Future<void> _signOut() async {
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      // Handle error
+    } finally {
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
+    // We add an AppBar here for the logout button
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('EcoGames'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _signOut,
+            tooltip: 'Logout',
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           _pages.elementAt(_selectedIndex),

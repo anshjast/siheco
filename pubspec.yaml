@@ -36,12 +36,11 @@ dependencies:
   intl:
   webview_flutter:
   provider:
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  supabase_flutter:
   cupertino_icons: ^1.0.8
   animate_do: # Added for easy animations
-  image_picker: ^1.2.0
+  image_picker:
+  pinput:
 
 dev_dependencies:
   flutter_test:

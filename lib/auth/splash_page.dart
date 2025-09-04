@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:animate_do/animate_do.dart';
+import 'package:project/main.dart'; // Import to get the supabase client
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,41 +14,33 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeApp();
+    _redirect();
   }
 
-  Future<void> _initializeApp() async {
-    // Wait for the authentication check and a minimum display time to complete.
-    final isLoggedIn = await _checkAuthStatus();
-
-    // Ensure the widget is still mounted before navigating.
-    if (!mounted) return;
-
-    if (isLoggedIn) {
-      // If logged in, go to the main app shell.
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      // If not logged in, go to the login screen.
-      Navigator.pushReplacementNamed(context, '/login');
-    }
-  }
-
-  /// Simulates checking the user's authentication status.
-  Future<bool> _checkAuthStatus() async {
-    // This is a placeholder for your actual authentication logic.
-    // You might check SharedPreferences, a secure token, or Firebase Auth.
-    //
-    // For this example, we'll wait for 3 seconds to ensure animations play,
-    // and we'll return 'false' to simulate a user who needs to log in.
+  Future<void> _redirect() async {
+    // Wait for a short duration to allow the animation to be visible.
     await Future.delayed(const Duration(seconds: 3));
 
-    // TO-DO: Replace 'false' with your actual login check.
-    // For example: return FirebaseAuth.instance.currentUser != null;
-    return false;
+    // Ensure the widget is still mounted before proceeding.
+    if (!mounted) return;
+
+    final session = supabase.auth.currentSession;
+
+    if (session != null) {
+      // If there's a session, the user is logged in.
+      // Navigate to the main app shell.
+      Navigator.of(context).pushReplacementNamed('/app');
+    } else {
+      // If there's no session, the user needs to log in.
+      Navigator.of(context).pushReplacementNamed('/login');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Before building, make sure you have the 'animate_do' package in your pubspec.yaml
+    // Also, ensure you have 'assets/images/sapling.gif' in your project and
+    // it is declared in the 'assets' section of your pubspec.yaml
     return Scaffold(
       body: Container(
         color: const Color(0xFFFCFCFC),

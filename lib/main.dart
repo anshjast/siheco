@@ -1,11 +1,35 @@
+// main.dart
+
 import 'package:flutter/material.dart';
-import 'auth/splash_page.dart';
-import 'auth/login_page.dart';
-import 'pages/app_shell.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
 
-// ------------------- THEME PROVIDER -------------------
-class ThemeProvider extends ChangeNotifier {
+// Import your pages
+import 'auth/login_page.dart';
+import 'auth/signup_page.dart';
+import 'pages/app_shell.dart';
+import 'auth/splash_page.dart'; // Import the splash screen
+
+// Define the supabase client globally
+final supabase = Supabase.instance.client;
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://luadhoeeywzgydwfegma.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1YWRob2VleXd6Z3lkd2ZlZ21hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5ODMyNjksImV4cCI6MjA3MjU1OTI2OX0.06Uwriwc2P1ae7W0hiTsue5yzC1RrFNPLyrA3wnFDSw',
+  );
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
+}
+
+class ThemeProvider with ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.light;
 
   ThemeMode get themeMode => _themeMode;
@@ -16,81 +40,25 @@ class ThemeProvider extends ChangeNotifier {
   }
 }
 
-// ------------------- LIGHT THEME -------------------
-final ThemeData lightTheme = ThemeData(
-  brightness: Brightness.light,
-  primarySwatch: Colors.green,
-  fontFamily: 'Poppins',
-  scaffoldBackgroundColor: Colors.grey[100],
-  cardColor: Colors.white,
-  appBarTheme: const AppBarTheme(
-    backgroundColor: Colors.white,
-    foregroundColor: Colors.black,
-    elevation: 0,
-  ),
-  textTheme: const TextTheme(
-    bodyLarge: TextStyle(color: Colors.black),
-    bodyMedium: TextStyle(color: Colors.black87),
-  ),
-  listTileTheme: const ListTileThemeData(
-    iconColor: Colors.black,
-    textColor: Colors.black,
-  ),
-);
-
-// ------------------- DARK THEME -------------------
-final ThemeData darkTheme = ThemeData(
-  brightness: Brightness.dark,
-  primarySwatch: Colors.green,
-  fontFamily: 'Poppins',
-  scaffoldBackgroundColor: Colors.black,
-  cardColor: const Color(0xFF1E1E1E), // Dark grey for cards
-  appBarTheme: const AppBarTheme(
-    backgroundColor: Color(0xFF1E1E1E),
-    foregroundColor: Colors.white,
-    elevation: 0,
-  ),
-  textTheme: const TextTheme(
-    bodyLarge: TextStyle(color: Colors.white),
-    bodyMedium: TextStyle(color: Colors.white70),
-  ),
-  listTileTheme: const ListTileThemeData(
-    iconColor: Colors.white,
-    textColor: Colors.white,
-  ),
-  switchTheme: SwitchThemeData(
-    thumbColor: MaterialStatePropertyAll(Colors.green),
-    trackColor: MaterialStatePropertyAll(Colors.greenAccent),
-  ),
-);
-
-// ------------------- APP ENTRY -------------------
-void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
-      child: const EcoGamesApp(),
-    ),
-  );
-}
-
-class EcoGamesApp extends StatelessWidget {
-  const EcoGamesApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-
     return MaterialApp(
       title: 'EcoGames',
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: themeProvider.themeMode,
+      theme: ThemeData.light(useMaterial3: true),
+      darkTheme: ThemeData.dark(useMaterial3: true),
+      themeMode: Provider.of<ThemeProvider>(context).themeMode,
       debugShowCheckedModeBanner: false,
-      home: const SplashScreen(),
+      // 1. Set the initial route to '/' for the splash screen
+      initialRoute: '/',
       routes: {
+        // 2. Define the route for the splash screen
+        '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
-        '/home': (context) => const AppShell(),
+        '/signup': (context) => const SignUpScreen(),
+        '/app': (context) => const AppShell(),
       },
     );
   }
