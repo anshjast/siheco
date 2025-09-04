@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../main.dart'; // for ThemeProvider
 import '../auth/login_page.dart';
+import '../settings/privacy_center.dart'; // Import privacy page
+import '../settings/about_page.dart';     // Import about page
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -33,7 +35,10 @@ class SettingsPage extends StatelessWidget {
             title: const Text("Privacy Centre"),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
-              // TODO: Implement privacy page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PrivacyCenterPage()),
+              );
             },
           ),
 
@@ -53,7 +58,10 @@ class SettingsPage extends StatelessWidget {
             title: const Text("About"),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
-              // TODO: Implement about page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AboutPage()),
+              );
             },
           ),
 
@@ -111,3 +119,4 @@ class SettingsPage extends StatelessWidget {
     );
   }
 }
+
