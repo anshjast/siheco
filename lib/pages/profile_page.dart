@@ -22,10 +22,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryGreen = Color(0xFF518548);
-    const Color progressBarBg = Color(0xFFDFF2D8);
-    const Color progressBarFill = Color(0xFF4CAF50);
-    const Color xpContainerBg = Color(0xFFE3F2DD);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Adjusted colors
+    final Color primaryGreen = const Color(0xFF518548);
+    final Color progressBarBg =
+    isDark ? Colors.grey[800]! : const Color(0xFFDFF2D8);
+    final Color progressBarFill = const Color(0xFF4CAF50);
+    final Color xpContainerBg =
+    isDark ? Colors.green.withOpacity(0.2) : const Color(0xFFE3F2DD);
 
     Widget buildBadge(String label, Color color, IconData iconData) {
       return Column(
@@ -34,9 +40,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withOpacity(0.15),
               shape: BoxShape.circle,
-              border: Border.all(color: color.withOpacity(0.5)),
+              border: Border.all(color: color.withOpacity(0.4)),
             ),
             child: Center(
               child: Icon(iconData, color: color, size: 40),
@@ -45,8 +51,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 8),
           Text(
             label,
-            style: const TextStyle(
+            style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
+              color: theme.textTheme.bodyMedium?.color,
             ),
           )
         ],
@@ -55,26 +62,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Profile',
-          style: TextStyle(
-            color: Colors.black87,
+          style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w700,
-            fontSize: 20,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.settings_outlined,
-              color: Colors.black54,
+              color: theme.iconTheme.color,
               size: 28,
             ),
             onPressed: () {
-              // ✅ Open SettingsPage without bottom nav
               Navigator.of(context, rootNavigator: true).push(
                 MaterialPageRoute(
                   builder: (_) => const SettingsPage(),
@@ -92,7 +96,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Center(
             child: CircleAvatar(
               radius: 60,
-              backgroundColor: Colors.white,
+              backgroundColor:
+              isDark ? Colors.grey[800] : Colors.white, // Dynamic bg
               child: const CircleAvatar(
                 radius: 55,
                 backgroundImage: AssetImage('assets/profile_avatar.png'),
@@ -104,12 +109,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Center(
             child: Column(
               children: [
-                const Text(
+                Text(
                   'Olivia Green',
-                  style: TextStyle(
+                  style: theme.textTheme.titleMedium?.copyWith(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -128,21 +132,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // XP points container
           Center(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+              padding:
+              const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
               decoration: BoxDecoration(
                 color: xpContainerBg,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.menu_book_outlined, color: Color(0xFFF1B233)),
-                  SizedBox(width: 6),
+                children: [
+                  const Icon(Icons.menu_book_outlined,
+                      color: Color(0xFFF1B233)),
+                  const SizedBox(width: 6),
                   Text(
                     '1,250',
-                    style: TextStyle(
+                    style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
                     ),
                   ),
                 ],
@@ -155,7 +160,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            elevation: 2,
+            elevation: isDark ? 0 : 2,
+            color: theme.cardColor,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
               child: Column(
@@ -163,16 +169,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
-                        'XP Progress',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
+                    children: [
+                      Text('XP Progress',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600)),
                       Text(
                         '750 / 1000',
-                        style: TextStyle(
+                        style: theme.textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: Colors.black54,
+                          color: isDark ? Colors.grey[400] : Colors.black54,
                         ),
                       ),
                     ],
@@ -202,12 +207,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'Badges',
-            style: TextStyle(
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w800,
               fontSize: 20,
-              color: Colors.black87,
             ),
           ),
           const SizedBox(height: 12),
@@ -219,7 +223,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 buildBadge('Eco-Explorer', const Color(0xFF778869), Icons.eco),
                 const SizedBox(width: 20),
-                buildBadge('Water Saver', const Color(0xFF439AAD),
+                buildBadge(
+                    'Water Saver',
+                    const Color(0xFF439AAD),
                     Icons.water_drop_outlined),
                 const SizedBox(width: 20),
                 buildBadge('Recycling Pro', const Color(0xFF3E5A27),
@@ -228,19 +234,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'My Sanctuary',
-            style: TextStyle(
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w800,
               fontSize: 20,
-              color: Colors.black87,
             ),
           ),
           const SizedBox(height: 12),
           Card(
             shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-            elevation: 2,
+            elevation: isDark ? 0 : 2,
+            color: theme.cardColor,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(18),
               child: Image.asset(
@@ -253,11 +259,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(14),
-              boxShadow: const [
+              boxShadow: isDark
+                  ? []
+                  : const [
                 BoxShadow(
                   color: Colors.black12,
                   blurRadius: 4,
@@ -269,7 +278,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFE4D3),
+                    color: isDark
+                        ? Colors.orange.withOpacity(0.2)
+                        : const Color(0xFFFFE4D3),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(8),
@@ -280,11 +291,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Text.rich(
                     TextSpan(
-                      style: TextStyle(color: Colors.black87, fontSize: 16),
-                      children: [
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontSize: 16,
+                      ),
+                      children: const [
                         TextSpan(text: "You’re on a "),
                         TextSpan(
                           text: "3-Day Streak!",
@@ -329,7 +342,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         selectedItemColor: primaryGreen,
-        unselectedItemColor: const Color(0xFF8FA89B),
+        unselectedItemColor: isDark ? Colors.grey[500] : const Color(0xFF8FA89B),
         type: BottomNavigationBarType.fixed,
         onTap: (index) {
           setState(() {
@@ -372,8 +385,14 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color cardBackground = Color(0xFFF8FAF3);
-    const Color textColor = Color(0xFF26492D);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final Color cardBackground =
+    isDark ? Colors.grey[900]! : const Color(0xFFF8FAF3);
+    final Color textColor =
+    isDark ? Colors.white : const Color(0xFF26492D);
+
     return Container(
       width: width,
       padding: const EdgeInsets.all(16),
@@ -386,7 +405,7 @@ class _StatCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: textColor,
               fontWeight: FontWeight.w600,
               fontSize: 14,
@@ -395,7 +414,7 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               color: textColor,
               fontWeight: FontWeight.bold,
               fontSize: 22,

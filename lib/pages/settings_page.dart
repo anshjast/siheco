@@ -1,91 +1,112 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../main.dart'; // for ThemeProvider
+import '../auth/login_page.dart';
 
 class SettingsPage extends StatelessWidget {
-  final VoidCallback? onLogout;
-
-  const SettingsPage({super.key, this.onLogout});
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        backgroundColor: Colors.grey.shade50,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
-          'Settings',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: const Text("Settings"),
         centerTitle: true,
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 16),
-              _buildSettingItem(context, 'Reset Password'),
-              _buildSettingItem(context, 'Help'),
-              _buildSettingItem(context, 'Privacy Centre'),
-              _buildSettingItem(context, 'Account Status'),
-              _buildSettingItem(context, 'About'),
-              const Spacer(),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: TextButton.icon(
-                  onPressed: onLogout ?? () {},
-                  icon: const Icon(Icons.logout, color: Colors.red),
-                  label: const Text(
-                    'Logout',
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 8, horizontal: 8),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
+      body: ListView(
+        children: [
+          // ------------------- HELP -------------------
+          ListTile(
+            leading: const Icon(Icons.help_outline),
+            title: const Text("Help"),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              // TODO: Implement help page
+            },
           ),
-        ),
-      ),
-    );
-  }
 
-  Widget _buildSettingItem(BuildContext context, String title,
-      {VoidCallback? onTap}) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+          // ------------------- PRIVACY CENTER -------------------
+          ListTile(
+            leading: const Icon(Icons.privacy_tip_outlined),
+            title: const Text("Privacy Centre"),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              // TODO: Implement privacy page
+            },
+          ),
+
+          // ------------------- ACCOUNT STATUS -------------------
+          ListTile(
+            leading: const Icon(Icons.account_circle_outlined),
+            title: const Text("Account Status"),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              // TODO: Implement account status page
+            },
+          ),
+
+          // ------------------- ABOUT -------------------
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: const Text("About"),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              // TODO: Implement about page
+            },
+          ),
+
+          const Divider(),
+
+          // ------------------- LANGUAGE -------------------
+          ListTile(
+            leading: const Icon(Icons.language),
+            title: const Text("Language"),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              // TODO: Add language picker
+            },
+          ),
+
+          // ------------------- THEME -------------------
+          SwitchListTile(
+            secondary: const Icon(Icons.dark_mode_outlined),
+            title: const Text("Dark Theme"),
+            value: themeProvider.themeMode == ThemeMode.dark,
+            onChanged: (value) {
+              themeProvider.toggleTheme(value);
+            },
+          ),
+
+          // ------------------- CONTACT US -------------------
+          ListTile(
+            leading: const Icon(Icons.contact_mail_outlined),
+            title: const Text("Contact Us"),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              // TODO: Implement contact page
+            },
+          ),
+
+          const Divider(),
+
+          // ------------------- LOGOUT -------------------
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: const Text(
+              "Logout",
+              style: TextStyle(color: Colors.red),
+            ),
+            trailing: const Icon(Icons.arrow_forward_ios, color: Colors.red, size: 16),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              );
+            },
           ),
         ],
-      ),
-      child: ListTile(
-        title: Text(title),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: onTap,
-        contentPadding:
-        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       ),
     );
   }
