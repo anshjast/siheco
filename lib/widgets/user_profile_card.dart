@@ -5,7 +5,10 @@ import 'package:project/widgets/calendar_widget.dart';
 import 'package:vibration/vibration.dart';
 
 class UserProfileCard extends StatefulWidget {
-  const UserProfileCard({super.key});
+  // --- The widget now accepts the current points as a parameter ---
+  final double currentPoints;
+
+  const UserProfileCard({super.key, required this.currentPoints});
 
   @override
   State<UserProfileCard> createState() => _UserProfileCardState();
@@ -19,7 +22,7 @@ class _UserProfileCardState extends State<UserProfileCard>
   final Set<double> _vibratedMilestones = {};
   final Map<double, bool> _isPopping = {};
 
-  final double _currentPoints = 6000;
+  // --- The hardcoded points value has been removed from here ---
   final double _maxPoints = 8000;
 
   final Map<double, String> thresholds = {
@@ -47,7 +50,8 @@ class _UserProfileCardState extends State<UserProfileCard>
     );
 
     _animation.addListener(() {
-      final currentProgressPoints = _animation.value * _currentPoints;
+      // --- Use widget.currentPoints to calculate progress ---
+      final currentProgressPoints = _animation.value * widget.currentPoints;
       for (final points in thresholds.keys) {
         if (currentProgressPoints >= points &&
             !_vibratedMilestones.contains(points)) {
@@ -140,7 +144,10 @@ class _UserProfileCardState extends State<UserProfileCard>
             children: [
               Expanded(
                 child: _buildStatColumn(
-                    'Eco-Points', '6,000', Icons.star_rounded),
+                    'Eco-Points',
+                    // --- Display the points passed into the widget ---
+                    NumberFormat('#,###').format(widget.currentPoints),
+                    Icons.star_rounded),
               ),
               Expanded(
                 child: _buildStatColumn(
@@ -210,7 +217,8 @@ class _UserProfileCardState extends State<UserProfileCard>
                   builder: (context, child) {
                     return Container(
                       height: 12,
-                      width: (_animation.value * _currentPoints / _maxPoints) *
+                      // --- Use widget.currentPoints for the progress bar width ---
+                      width: (_animation.value * widget.currentPoints / _maxPoints) *
                           constraints.maxWidth,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
@@ -228,7 +236,8 @@ class _UserProfileCardState extends State<UserProfileCard>
                 final points = entry.key;
                 final imagePath = entry.value;
                 final position = (points / _maxPoints) * constraints.maxWidth;
-                final currentProgressPoints = _animation.value * _currentPoints;
+                // --- Use widget.currentPoints here as well ---
+                final currentProgressPoints = _animation.value * widget.currentPoints;
                 final isLastBadge = points == _maxPoints;
                 final isAchieved = currentProgressPoints >= points;
                 final isPopping = _isPopping[points] ?? false;
@@ -297,4 +306,3 @@ class _UserProfileCardState extends State<UserProfileCard>
     );
   }
 }
-

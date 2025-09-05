@@ -44,19 +44,43 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _signIn() async {
-    // This function is for UI demonstration and will always navigate to the home screen.
-    // The database authentication has been removed as requested.
     setState(() {
       _isLoading = true;
     });
 
-    // Simulate a network delay for a better user experience
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil('/app', (route) => false);
+    try {
+      await supabase.auth.signInWithPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      if (mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil('/app', (route) => false);
+      }
+    } on AuthException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('An unexpected error occurred.'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
-    // No need to set isLoading to false as the widget will be disposed after navigation.
   }
 
   @override
@@ -232,4 +256,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
