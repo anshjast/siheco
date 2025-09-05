@@ -10,12 +10,18 @@ class HeaderSection extends StatefulWidget {
   final double currentPoints;
   final GlobalKey pointsDisplayKey;
   final bool isCollecting;
+  final String fullName;
+  final String userName;
+  final String? avatarUrl; // <-- ADD THIS LINE
 
   const HeaderSection({
     super.key,
     required this.currentPoints,
     required this.pointsDisplayKey,
     required this.isCollecting,
+    required this.fullName,
+    required this.userName,
+    this.avatarUrl, // <-- ADD THIS LINE
   });
 
   @override
@@ -23,7 +29,8 @@ class HeaderSection extends StatefulWidget {
 }
 
 // --- Use TickerProviderStateMixin for multiple AnimationControllers ---
-class _HeaderSectionState extends State<HeaderSection> with TickerProviderStateMixin {
+class _HeaderSectionState extends State<HeaderSection>
+    with TickerProviderStateMixin {
   late AnimationController _scaleController;
   late AnimationController _countController; // Controller for the number count-up
   late Animation<double> _scaleAnimation;
@@ -45,8 +52,10 @@ class _HeaderSectionState extends State<HeaderSection> with TickerProviderStateM
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2)
         .animate(CurvedAnimation(parent: _scaleController, curve: Curves.easeOut));
 
-    _countAnimation = Tween<double>(begin: widget.currentPoints, end: widget.currentPoints)
-        .animate(CurvedAnimation(parent: _countController, curve: Curves.easeOut));
+    _countAnimation = Tween<double>(
+        begin: widget.currentPoints, end: widget.currentPoints)
+        .animate(
+        CurvedAnimation(parent: _countController, curve: Curves.easeOut));
   }
 
   @override
@@ -71,7 +80,8 @@ class _HeaderSectionState extends State<HeaderSection> with TickerProviderStateM
       _countAnimation = Tween<double>(
         begin: oldWidget.currentPoints,
         end: widget.currentPoints,
-      ).animate(CurvedAnimation(parent: _countController, curve: Curves.easeOut));
+      ).animate(
+          CurvedAnimation(parent: _countController, curve: Curves.easeOut));
 
       _countController.reset();
       _countController.forward();
@@ -85,32 +95,57 @@ class _HeaderSectionState extends State<HeaderSection> with TickerProviderStateM
     super.dispose();
   }
 
+  /// Generates initials from a full name.
+  String getInitials(String fullName) {
+    List<String> names = fullName.trim().split(' ');
+    if (names.isEmpty || names.first.isEmpty) {
+      return '?'; // Return a placeholder if the name is empty
+    }
+    String initials = names.first[0];
+    if (names.length > 1 && names.last.isNotEmpty) {
+      initials += names.last[0];
+    }
+    return initials.toUpperCase();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final hasAvatar = widget.avatarUrl != null && widget.avatarUrl!.isNotEmpty;
+    final initials = getInitials(widget.fullName);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Welcome back,',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-                fontFamily: 'Inter',
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                widget.fullName,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2E7D32),
+                  fontFamily: 'Inter',
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
-            ),
-            Text(
-              'Alex Green!',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2E7D32),
-                fontFamily: 'Inter',
+              const SizedBox(height: 2),
+              Text(
+                '@${widget.userName}',
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: Colors.grey,
+                  fontFamily: 'Inter',
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         Row(
           children: [
@@ -119,13 +154,21 @@ class _HeaderSectionState extends State<HeaderSection> with TickerProviderStateM
               child: _buildPointsDisplay(),
             ),
             const SizedBox(width: 12),
+            // --- UPDATED AVATAR LOGIC ---
             CircleAvatar(
               radius: 30,
-              backgroundImage: const NetworkImage(
-                  'https://dummyimage.com/360x360/a9dfbe/767676&text=AG'),
-              onBackgroundImageError: (exception, stackTrace) {
-                // Handle error
-              },
+              backgroundColor: Colors.green.shade200,
+              backgroundImage: hasAvatar ? NetworkImage(widget.avatarUrl!) : null,
+              child: !hasAvatar
+                  ? Text(
+                initials,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                  color: Colors.white,
+                ),
+              )
+                  : null, // Display nothing if there is an image
             ),
           ],
         ),
@@ -168,4 +211,3 @@ class _HeaderSectionState extends State<HeaderSection> with TickerProviderStateM
     );
   }
 }
-

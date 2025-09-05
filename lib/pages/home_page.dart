@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'dart:math';
 import 'package:vibration/vibration.dart'; // Import the vibration package
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../main.dart'; // To access the global `supabase` client instance
 
 // --- Import the external widgets that will now be used on this page ---
 import 'package:project/widgets/user_profile_card.dart';
@@ -33,12 +35,65 @@ class _HomePageState extends State<HomePage> {
   final Random _random = Random();
   bool _isCollectingPoints = false;
 
+  // --- ADD STATE VARIABLES FOR USER PROFILE ---
+  String _fullName = 'User';
+  String _userName = 'username';
+  String? _avatarUrl; // <-- ADD THIS LINE
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // --- FETCH USER DATA WHEN THE PAGE LOADS ---
+    _fetchUserProfile();
+  }
+
+  /// Fetches the full_name, username, and avatar_url from the profiles table.
+  Future<void> _fetchUserProfile() async {
+    try {
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) {
+        throw 'User not logged in';
+      }
+      // Fetch full_name, username, and avatar_url
+      final data = await supabase
+          .from('profiles')
+          .select('full_name, username, avatar_url') // <-- UPDATE THIS LINE
+          .eq('id', userId)
+          .single();
+
+      if (mounted) {
+        setState(() {
+          // Store all values from the database
+          _fullName = (data['full_name'] as String?) ?? 'User';
+          _userName = (data['username'] as String?) ?? 'username';
+          _avatarUrl = data['avatar_url'] as String?; // <-- ADD THIS LINE
+          _isLoading = false;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        // Handle error, maybe show a snackbar or log it
+        print("Error fetching user profile: $error");
+        setState(() {
+          _fullName = 'User'; // Fallback name on error
+          _userName = 'error'; // Fallback username on error
+          _avatarUrl = null;
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+
   Future<void> _handleRefresh() async {
     await Future.delayed(const Duration(seconds: 1));
     if (mounted) {
       setState(() {
         _contentKey = UniqueKey();
       });
+      // Also refetch user profile on refresh
+      await _fetchUserProfile();
     }
   }
 
@@ -173,6 +228,10 @@ class _HomePageState extends State<HomePage> {
                         currentPoints: _currentPoints,
                         pointsDisplayKey: _pointsDisplayKey,
                         isCollecting: _isCollectingPoints,
+                        // --- PASS ALL FETCHED DATA TO THE HEADER ---
+                        fullName: _isLoading ? '' : _fullName,
+                        userName: _isLoading ? '...' : _userName,
+                        avatarUrl: _avatarUrl, // <-- PASS THE AVATAR URL
                       ),
                     ),
                   ),
