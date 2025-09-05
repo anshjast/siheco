@@ -10,6 +10,7 @@ class EcoTask {
   final Color iconColor;
   final Color backgroundColor;
   bool isCompleted;
+  bool isLocked; // <-- ADDED: To handle locked state
 
   EcoTask({
     required this.title,
@@ -19,6 +20,7 @@ class EcoTask {
     required this.iconColor,
     required this.backgroundColor,
     this.isCompleted = false,
+    this.isLocked = false, // <-- ADDED: Default to not locked
   });
 }
 
@@ -36,34 +38,59 @@ class DailyEcoPoints extends StatefulWidget {
   State<DailyEcoPoints> createState() => _DailyEcoPointsState();
 }
 
-class _DailyEcoPointsState extends State<DailyEcoPoints> {
+// --- MODIFIED: Added AutomaticKeepAliveClientMixin to preserve state ---
+class _DailyEcoPointsState extends State<DailyEcoPoints> with AutomaticKeepAliveClientMixin {
   // A list of tasks for the user to complete, with a green theme
   final List<EcoTask> _tasks = [
     EcoTask(
-        title: 'Plant Two Trees',
-        subtitle: 'Completed (1/2)',
-        points: 500,
-        icon: Icons.park_rounded,
-        iconColor: Colors.green.shade800,
-        backgroundColor: Colors.green.shade100),
+        title: 'Login to App',
+        subtitle: 'Log in for the first time today',
+        points: 10,
+        icon: Icons.login_rounded,
+        iconColor: Colors.blue.shade800,
+        backgroundColor: Colors.blue.shade100,
+        isCompleted: true),
     EcoTask(
-        title: 'Recycle Plastics',
-        subtitle: 'Recycle 5 plastic bottles',
+        title: 'Complete a Challenge',
+        subtitle: 'Finish any daily challenge',
+        points: 50,
+        icon: Icons.star_border_rounded,
+        iconColor: Colors.amber.shade800,
+        backgroundColor: Colors.amber.shade100),
+    EcoTask(
+        title: 'Complete a Quiz',
+        subtitle: 'Test your eco-knowledge',
         points: 25,
-        icon: Icons.recycling_rounded,
-        iconColor: Colors.teal.shade800,
-        backgroundColor: Colors.teal.shade100),
+        icon: Icons.quiz_outlined,
+        iconColor: Colors.purple.shade800,
+        backgroundColor: Colors.purple.shade100),
     EcoTask(
-        title: 'Conserve Water',
-        subtitle: 'Take a 5-minute shower',
-        points: 15,
-        icon: Icons.water_drop_rounded,
-        iconColor: Colors.cyan.shade800,
-        backgroundColor: Colors.cyan.shade100),
+        title: 'Upload Your Creation',
+        subtitle: 'Share your work with the community',
+        points: 100,
+        icon: Icons.cloud_upload_outlined,
+        iconColor: Colors.green.shade800,
+        backgroundColor: Colors.green.shade100,
+        isLocked: true), // <-- MODIFIED: This task is locked
+    EcoTask(
+        title: "Review a Member's Creation",
+        subtitle: 'Provide feedback to a peer',
+        points: 20,
+        icon: Icons.rate_review_outlined,
+        iconColor: Colors.pink.shade800,
+        backgroundColor: Colors.pink.shade100,
+        isLocked: true), // <-- MODIFIED: This task is locked
   ];
+
+  // --- ADDED: Override wantKeepAlive and set to true ---
+  @override
+  bool get wantKeepAlive => true;
+
 
   @override
   Widget build(BuildContext context) {
+    // --- ADDED: Call super.build to satisfy the mixin requirements ---
+    super.build(context);
     return Card(
       color: Colors.green.shade50,
       elevation: 4,
@@ -98,7 +125,7 @@ class _DailyEcoPointsState extends State<DailyEcoPoints> {
                 return _EcoTaskItem(
                   task: task,
                   onCollect: (startKey) {
-                    if (!task.isCompleted) {
+                    if (!task.isCompleted && !task.isLocked) {
                       widget.onPointsCollected(startKey, task.points);
                       setState(() {
                         task.isCompleted = true;
@@ -126,8 +153,39 @@ class _EcoTaskItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget avatar;
+    Color chipColor;
+    Color labelColor;
+    VoidCallback? onPressed;
+
+    if (task.isLocked) {
+      // --- LOCKED STATE ---
+      // Note: Make sure 'assets/images/lock.png' exists in your project.
+      avatar = Image.asset('assets/images/lock.png', width: 16, height: 16); // <-- MODIFIED: Removed color filter
+      chipColor = Colors.grey.shade200;
+      labelColor = Colors.grey.shade700;
+      onPressed = null; // Disable the chip
+    } else if (task.isCompleted) {
+      // --- COMPLETED STATE ---
+      avatar = Icon(Icons.check_rounded, color: Colors.green.shade700, size: 18);
+      chipColor = Colors.green.shade100;
+      labelColor = Colors.green.shade900;
+      onPressed = () {}; // Disable but show as complete
+    } else {
+      // --- COLLECTIBLE STATE ---
+      avatar = Image.asset(
+        'assets/gifs/coin.gif',
+        key: _iconKey,
+        width: 18,
+        height: 18,
+      );
+      chipColor = Colors.orange.shade100;
+      labelColor = Colors.orange.shade900;
+      onPressed = () => onCollect(_iconKey);
+    }
+
     return ListTile(
-      dense: true, // This is key for a compact layout
+      dense: true,
       contentPadding: const EdgeInsets.symmetric(horizontal: 4.0),
       leading: CircleAvatar(
         radius: 20,
@@ -150,29 +208,22 @@ class _EcoTaskItem extends StatelessWidget {
         ),
       ),
       trailing: ActionChip(
-        avatar: task.isCompleted
-            ? Icon(Icons.check_rounded, color: Colors.green.shade700, size: 18)
-        // --- Changed back to coin.gif ---
-            : Image.asset(
-          'assets/gifs/coin.gif',
-          key: _iconKey,
-          width: 18,
-          height: 18,
-        ),
+        avatar: avatar,
         label: Text(
           task.isCompleted ? 'Done' : '${task.points}',
           style: GoogleFonts.nunito(
             fontWeight: FontWeight.bold,
-            color: task.isCompleted ? Colors.green.shade900 : Colors.orange.shade900,
+            color: labelColor,
             fontSize: 13,
           ),
         ),
-        backgroundColor: task.isCompleted ? Colors.green.shade100 : Colors.orange.shade100,
-        onPressed: task.isCompleted ? () {} : () => onCollect(_iconKey),
+        backgroundColor: chipColor,
+        onPressed: onPressed,
         shape: const StadiumBorder(),
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // Reduces chip padding
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
       ),
     );
   }
 }
+

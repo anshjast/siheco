@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart'; // <-- IMPORT THE PACKAGE
 
 // Import your pages
 import 'auth/login_page.dart';
@@ -14,7 +15,10 @@ import 'auth/splash_page.dart'; // Import the splash screen
 final supabase = Supabase.instance.client;
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  // --- MODIFICATION FOR NATIVE SPLASH ---
+  // This needs to be called to preserve the splash screen
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   await Supabase.initialize(
     url: 'https://luadhoeeywzgydwfegma.supabase.co',
@@ -27,6 +31,9 @@ Future<void> main() async {
       child: const MyApp(),
     ),
   );
+
+  // --- REMOVE THE NATIVE SPLASH AFTER INITIALIZATION ---
+  FlutterNativeSplash.remove();
 }
 
 class ThemeProvider with ChangeNotifier {
@@ -51,10 +58,9 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark(useMaterial3: true),
       themeMode: Provider.of<ThemeProvider>(context).themeMode,
       debugShowCheckedModeBanner: false,
-      // 1. Set the initial route to '/' for the splash screen
+      // Your custom splash page will now handle the logic
       initialRoute: '/',
       routes: {
-        // 2. Define the route for the splash screen
         '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),

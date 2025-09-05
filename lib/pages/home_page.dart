@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'dart:math';
-import 'package:vibration/vibration.dart'; // Import the vibration package
+import 'package:vibration/vibration.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../main.dart'; // To access the global `supabase` client instance
 
 // --- Import the external widgets that will now be used on this page ---
 import 'package:project/widgets/user_profile_card.dart';
@@ -14,10 +13,7 @@ import 'package:project/widgets/daily_tip_card.dart';
 import 'package:project/widgets/challenges_widget.dart';
 import 'package:project/widgets/quiz_card.dart';
 import 'package:project/widgets/daily_eco_points.dart';
-
-// Note: To use vibration, add this to your pubspec.yaml:
-// dependencies:
-//   vibration: ^1.8.4
+import '../main.dart'; // To access the global `supabase` client instance
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,75 +24,106 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var _contentKey = UniqueKey();
-  double _currentPoints = 6000;
+  // --- MODIFIED: This will now hold the total points from Supabase ---
+  int _totalPoints = 0;
   final GlobalKey _pointsDisplayKey = GlobalKey();
 
   final List<Widget> _flyingCoins = [];
   final Random _random = Random();
   bool _isCollectingPoints = false;
 
-  // --- ADD STATE VARIABLES FOR USER PROFILE ---
+  // --- MODIFIED: State variables to hold all profile data ---
   String _fullName = 'User';
   String _userName = 'username';
-  String? _avatarUrl; // <-- ADD THIS LINE
+  String? _avatarUrl;
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    // --- FETCH USER DATA WHEN THE PAGE LOADS ---
     _fetchUserProfile();
   }
 
-  /// Fetches the full_name, username, and avatar_url from the profiles table.
+  // --- MODIFIED: Fetches all user data, including total_points ---
   Future<void> _fetchUserProfile() async {
     try {
       final userId = supabase.auth.currentUser?.id;
-      if (userId == null) {
-        throw 'User not logged in';
-      }
-      // Fetch full_name, username, and avatar_url
+      if (userId == null) throw 'User not logged in';
+
+      // --- Query the view to get the calculated total_points ---
       final data = await supabase
-          .from('profiles')
-          .select('full_name, username, avatar_url') // <-- UPDATE THIS LINE
+          .from('profiles_with_points')
+          .select('full_name, username, avatar_url, total_points')
           .eq('id', userId)
           .single();
 
       if (mounted) {
         setState(() {
-          // Store all values from the database
           _fullName = (data['full_name'] as String?) ?? 'User';
           _userName = (data['username'] as String?) ?? 'username';
-          _avatarUrl = data['avatar_url'] as String?; // <-- ADD THIS LINE
+          _avatarUrl = data['avatar_url'] as String?;
+          // --- Set the total points from the database ---
+          _totalPoints = (data['total_points'] as int?) ?? 0;
           _isLoading = false;
         });
       }
     } catch (error) {
       if (mounted) {
-        // Handle error, maybe show a snackbar or log it
         print("Error fetching user profile: $error");
         setState(() {
-          _fullName = 'User'; // Fallback name on error
-          _userName = 'error'; // Fallback username on error
-          _avatarUrl = null;
+          // Set fallback values on error
+          _fullName = 'User';
+          _userName = 'error';
+          _totalPoints = 0;
           _isLoading = false;
         });
+      }
+    }
+  }
+
+  // --- NEW: Function to add points to the database ---
+  Future<void> _addPoints(int pointsToAdd) async {
+    if (_isLoading) return; // Prevent updates while initially loading
+
+    try {
+      final userId = supabase.auth.currentUser!.id;
+
+      // 1. Get the current points for course_1
+      final currentData = await supabase
+          .from('user_courses')
+          .select('course_1_points')
+          .eq('id', userId)
+          .single();
+
+      final currentPoints = currentData['course_1_points'] as int;
+
+      // 2. Calculate the new total and update the table
+      final newPoints = currentPoints + pointsToAdd;
+      await supabase
+          .from('user_courses')
+          .update({'course_1_points': newPoints})
+          .eq('id', userId);
+
+      // 3. Refresh the user profile to get the new calculated total_points
+      //    and update the UI automatically.
+      await _fetchUserProfile();
+
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error updating points: $error'),
+          backgroundColor: Colors.red,
+        ));
       }
     }
   }
 
 
   Future<void> _handleRefresh() async {
-    await Future.delayed(const Duration(seconds: 1));
-    if (mounted) {
-      setState(() {
-        _contentKey = UniqueKey();
-      });
-      // Also refetch user profile on refresh
-      await _fetchUserProfile();
-    }
+    await _fetchUserProfile();
   }
 
+  // --- MODIFIED: This now triggers the database update ---
   void _onPointsCollected(GlobalKey startKey, int points) {
     final startContext = startKey.currentContext;
     final endContext = _pointsDisplayKey.currentContext;
@@ -135,24 +162,19 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
+    // This delay is for the animation. The points are added after it completes.
     Future.delayed(const Duration(milliseconds: 750), () async {
       if (mounted) {
+        // --- Call the new function to update points in Supabase ---
+        await _addPoints(points);
+
         if (await Vibration.hasVibrator() ?? false) {
-          int vibrationCount = (points / 10).floor();
-
-          const int maxVibrations = 25;
-          if (vibrationCount > maxVibrations) {
-            vibrationCount = maxVibrations;
-          }
-
+          int vibrationCount = (points / 10).floor().clamp(0, 25);
           for (int i = 0; i < vibrationCount; i++) {
             Vibration.vibrate(duration: 20, amplitude: 100);
             await Future.delayed(const Duration(milliseconds: 60));
           }
         }
-        setState(() {
-          _currentPoints += points;
-        });
       }
     });
 
@@ -167,10 +189,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // A list of all widgets that will appear below the sticky header.
     final List<Widget> scrollableContent = [
       const SizedBox(height: 20),
-      UserProfileCard(currentPoints: _currentPoints),
+      // --- MODIFIED: Pass the fetched points to the profile card ---
+      UserProfileCard(currentPoints: _totalPoints.toDouble()),
       const SizedBox(height: 30),
       const SectionTitle(title: 'Daily Eco-Points'),
       const SizedBox(height: 15),
@@ -210,11 +232,9 @@ class _HomePageState extends State<HomePage> {
             height: 100,
             animSpeedFactor: 2.0,
             showChildOpacityTransition: false,
-            // --- Use CustomScrollView to enable sticky headers ---
             child: CustomScrollView(
               key: _contentKey,
               slivers: [
-                // --- This makes the HeaderSection sticky ---
                 SliverPersistentHeader(
                   pinned: true,
                   delegate: _StickyHeaderDelegate(
@@ -222,22 +242,19 @@ class _HomePageState extends State<HomePage> {
                     maxHeight: 96.0,
                     child: Container(
                       color: Theme.of(context).scaffoldBackgroundColor,
-                      // Apply the original horizontal and vertical padding here to the header
                       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                      // --- MODIFIED: Pass all fetched data to the header ---
                       child: HeaderSection(
-                        currentPoints: _currentPoints,
+                        currentPoints: _totalPoints.toDouble(),
                         pointsDisplayKey: _pointsDisplayKey,
                         isCollecting: _isCollectingPoints,
-                        // --- PASS ALL FETCHED DATA TO THE HEADER ---
-                        fullName: _isLoading ? '' : _fullName,
+                        fullName: _isLoading ? 'Loading...' : _fullName,
                         userName: _isLoading ? '...' : _userName,
-                        avatarUrl: _avatarUrl, // <-- PASS THE AVATAR URL
+                        avatarUrl: _avatarUrl,
                       ),
                     ),
                   ),
                 ),
-                // --- The rest of the content scrolls normally ---
-                // SliverPadding ensures the scrollable content also has the correct horizontal padding
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   sliver: SliverList(
