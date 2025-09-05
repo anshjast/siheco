@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:video_player/video_player.dart';
 import 'package:animate_do/animate_do.dart';
-import '../main.dart';
 
-// Note: Ensure you have the video_player and animate_do packages in your pubspec.yaml
-// and the 'login_bk.mp4' video in your 'assets/videos/' folder.
+final supabase = Supabase.instance.client;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,16 +13,22 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
   bool _obscurePassword = true;
   bool _isLoading = false;
+
   late VideoPlayerController _videoController;
 
   @override
   void initState() {
     super.initState();
-    _videoController = VideoPlayerController.asset('assets/videos/signup_bk_1.mp4')
+
+    _videoController =
+    VideoPlayerController.asset('assets/videos/login_bk_1.mp4')
       ..initialize().then((_) {
         _videoController.setVolume(0.0);
         _videoController.setLooping(true);
@@ -43,22 +47,50 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _signIn() async {
-    // This function is for UI demonstration and will always navigate to the home screen.
-    // The database authentication has been removed as requested.
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Simulate a network delay for a better user experience
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil('/app', (route) => false);
+  // 📌 Handle Login
+  Future<void> _login() async {
+    if (_emailController.text.trim().isEmpty ||
+        _passwordController.text.trim().isEmpty) {
+      _showMessage("Please fill all fields", isError: true);
+      return;
     }
-    // No need to set isLoading to false as the widget will be disposed after navigation.
+
+    setState(() => _isLoading = true);
+
+    try {
+      final AuthResponse res = await supabase.auth.signInWithPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      if (res.user != null) {
+        _showMessage("Login successful! 🎉");
+        if (mounted) {
+          Navigator.of(context).pushReplacementNamed('/app');
+        }
+      } else {
+        _showMessage("Invalid credentials", isError: true);
+      }
+    } on AuthException catch (e) {
+      _showMessage(e.message, isError: true);
+    } catch (e) {
+      _showMessage("An error occurred: $e", isError: true);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
+  // 📌 Show SnackBar Messages
+  void _showMessage(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.green,
+      ),
+    );
+  }
+
+  // =================== UI ===================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,22 +108,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-          // Greyish Overlay
-          Container(color: Colors.black.withOpacity(0.5)),
+          // Grey overlay
+          Container(color: Colors.black.withOpacity(0.6)),
 
-          // UI Content
+          // Login Form
           SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Form(
+                key: _formKey,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     FadeInDown(
                       child: const Text(
                         "Welcome Back",
-                        textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 42,
@@ -99,113 +129,94 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    FadeInDown(
-                      delay: const Duration(milliseconds: 300),
-                      child: const Text(
-                        "Continue your journey with us.",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
+                    const SizedBox(height: 40),
+
+                    // Email
+                    _buildTextField(
+                      controller: _emailController,
+                      hintText: "Email",
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Password
+                    _buildTextField(
+                      controller: _passwordController,
+                      hintText: "Password",
+                      obscureText: _obscurePassword,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: Colors.white70,
-                          fontSize: 18,
                         ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
                       ),
                     ),
-                    const SizedBox(height: 60),
+                    const SizedBox(height: 30),
 
-                    // Email Field
-                    FadeInUp(
-                      delay: const Duration(milliseconds: 500),
-                      child: _buildTextField(
-                        controller: _emailController,
-                        hintText: "Email or Username",
-                        keyboardType: TextInputType.emailAddress,
+                    // Login Button
+                    _isLoading
+                        ? const CircularProgressIndicator()
+                        : ElevatedButton(
+                      onPressed: _login,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 16, horizontal: 60),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        "Login",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
 
-                    // Password Field
-                    FadeInUp(
-                      delay: const Duration(milliseconds: 700),
-                      child: _buildTextField(
-                        controller: _passwordController,
-                        hintText: "Password",
-                        obscureText: _obscurePassword,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                            color: Colors.white70,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
+                    // Don't have account? SignUp
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "Don't have an account? ",
+                          style: TextStyle(color: Colors.white70),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-
-                    // Login Button
-                    FadeInUp(
-                      delay: const Duration(milliseconds: 900),
-                      child: _isLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : ElevatedButton(
-                        onPressed: _signIn,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          "Login",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Sign up link
-                    FadeInUp(
-                      delay: const Duration(milliseconds: 1100),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            "Don't have an account? ",
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                          GestureDetector(
-                            onTap: () => Navigator.pushNamed(context, '/signup'),
-                            child: const Text(
-                              'Sign Up',
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
+                        GestureDetector(
+                          onTap: () => Navigator.pushReplacementNamed(
+                              context, '/signup'),
+                          child: const Text(
+                            "Sign Up",
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),
             ),
-          ),
+          )
         ],
       ),
     );
   }
 
+  // 📌 Reusable TextField
   Widget _buildTextField({
     required TextEditingController controller,
     required String hintText,
@@ -232,4 +243,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-

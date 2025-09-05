@@ -8,17 +8,18 @@ import 'package:provider/provider.dart';
 import 'auth/login_page.dart';
 import 'auth/signup_page.dart';
 import 'pages/app_shell.dart';
-import 'auth/splash_page.dart'; // Import the splash screen
+import 'auth/splash_page.dart';
 
-// Define the supabase client globally
+// Define the Supabase client globally
 final supabase = Supabase.instance.client;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
-    url: 'https://kodknsdnkjcsjsncksn.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInscscscscMiOiJzdXBhYmFzZSIsInJlZiI6Imx1YWRob2VleXd6Z3lkd2ZlZ21hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5ODMyNjksImV4cCI6MjA3MjU1OTI2OX0.06Uwriwc2P1ae7W0hiTsue5yzC1RrFNPLyrA3wnFDSw',
+    url: 'https://luadhoeeywzgydwfegma.supabase.co', // replace with your URL
+    anonKey:
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1YWRob2VleXd6Z3lkd2ZlZ21hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5ODMyNjksImV4cCI6MjA3MjU1OTI2OX0.06Uwriwc2P1ae7W0hiTsue5yzC1RrFNPLyrA3wnFDSw', // replace with your key
   );
 
   runApp(
@@ -51,10 +52,10 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark(useMaterial3: true),
       themeMode: Provider.of<ThemeProvider>(context).themeMode,
       debugShowCheckedModeBanner: false,
-      // 1. Set the initial route to '/' for the splash screen
+
+      // Show splash first → decide login or app
       initialRoute: '/',
       routes: {
-        // 2. Define the route for the splash screen
         '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
