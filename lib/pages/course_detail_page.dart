@@ -305,8 +305,16 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.courseTitle),
-        backgroundColor: const Color(0xFF56ab2f),
+        // --- CHANGES ARE HERE ---
+        title: Text(
+          widget.courseTitle,
+          style: const TextStyle(color: Colors.black87), // Set title color to be visible
+        ),
+        backgroundColor: Colors.transparent, // Make AppBar background transparent
+        elevation: 0, // Remove shadow
+        iconTheme: const IconThemeData(
+          color: Colors.black87, // Change back button color to be visible
+        ),
       ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 500),
@@ -319,4 +327,3 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
     );
   }
 }
-

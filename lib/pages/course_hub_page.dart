@@ -66,8 +66,16 @@ class _CourseHubPageState extends State<CourseHubPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.course.title),
-        backgroundColor: const Color(0xFF56ab2f),
+        // --- CHANGES ARE HERE ---
+        title: Text(
+          widget.course.title,
+          style: const TextStyle(color: Colors.black87), // Set title color to be visible
+        ),
+        backgroundColor: Colors.transparent, // Make AppBar background transparent
+        elevation: 0, // Remove shadow
+        iconTheme: const IconThemeData(
+          color: Colors.black87, // Change back button color to be visible
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -122,7 +130,7 @@ class _CourseHubPageState extends State<CourseHubPage> {
               },
             ),
             const SizedBox(height: 16),
-            // --- Final Challenge Card (THIS IS THE MAIN CHANGE) ---
+            // --- Final Challenge Card (No changes) ---
             _buildHubCard(
               icon: Icons.camera_alt,
               title: 'Final Challenge',
@@ -131,8 +139,6 @@ class _CourseHubPageState extends State<CourseHubPage> {
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => TaskPage(
-                    // We now pass the ENTIRE course object, which includes the
-                    // new badge name, icon, XP, and coins.
                     course: widget.course,
                     onTaskComplete: widget.onCourseComplete,
                   ),
@@ -186,4 +192,3 @@ class _CourseHubPageState extends State<CourseHubPage> {
     );
   }
 }
-
