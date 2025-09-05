@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'settings_page.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -19,13 +20,39 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   int _selectedIndex = 3; // Profile tab selected
+  String? _fullName;
+  String? _avatarUrl; // <-- NEW avatar field
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+
+    final response = await Supabase.instance.client
+        .from('profiles')
+        .select('full_name, username, email, avatar_url') // <-- added avatar_url
+        .eq('id', user.id)
+        .maybeSingle();
+
+    setState(() {
+      _fullName = response?['full_name'] ??
+          response?['username'] ??
+          response?['email'] ??
+          'Eco User';
+      _avatarUrl = response?['avatar_url']; // <-- save avatar
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    // Adjusted colors
     final Color primaryGreen = const Color(0xFF518548);
     final Color progressBarBg =
     isDark ? Colors.grey[800]! : const Color(0xFFDFF2D8);
@@ -96,21 +123,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Center(
             child: CircleAvatar(
               radius: 60,
-              backgroundColor:
-              isDark ? Colors.grey[800] : Colors.white, // Dynamic bg
-              child: const CircleAvatar(
+              backgroundColor: isDark ? Colors.grey[800] : Colors.white,
+              child: CircleAvatar(
                 radius: 55,
-                backgroundImage: AssetImage('assets/profile_avatar.png'),
+                backgroundImage: _avatarUrl != null && _avatarUrl!.isNotEmpty
+                    ? NetworkImage(_avatarUrl!) // <-- Load from Supabase
+                    : const AssetImage('assets/profile_avatar.png')
+                as ImageProvider, // <-- fallback
               ),
             ),
           ),
           const SizedBox(height: 16),
-          // Name and title
+
+          // --- Name & Title ---
           Center(
             child: Column(
               children: [
                 Text(
-                  'Olivia Green',
+                  _fullName ?? "Loading...",
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -129,6 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 16),
+
           // XP points container
           Center(
             child: Container(
@@ -154,7 +185,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ),
+
           const SizedBox(height: 24),
+
           // XP Progress Card
           Card(
             shape: RoundedRectangleBorder(
@@ -206,15 +239,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ),
+
           const SizedBox(height: 24),
-          Text(
-            'Badges',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w800,
-              fontSize: 20,
-            ),
-          ),
+          Text("Badges",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+                fontSize: 20,
+              )),
           const SizedBox(height: 12),
+
+          // --- BADGES ---
           SizedBox(
             height: 120,
             child: ListView(
@@ -223,9 +257,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 buildBadge('Eco-Explorer', const Color(0xFF778869), Icons.eco),
                 const SizedBox(width: 20),
-                buildBadge(
-                    'Water Saver',
-                    const Color(0xFF439AAD),
+                buildBadge('Water Saver', const Color(0xFF439AAD),
                     Icons.water_drop_outlined),
                 const SizedBox(width: 20),
                 buildBadge('Recycling Pro', const Color(0xFF3E5A27),
@@ -233,18 +265,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           ),
+
           const SizedBox(height: 24),
-          Text(
-            'My Sanctuary',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w800,
-              fontSize: 20,
-            ),
-          ),
+          Text("My Sanctuary",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+                fontSize: 20,
+              )),
           const SizedBox(height: 12),
+
+          // Sanctuary Image
           Card(
-            shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18)),
             elevation: isDark ? 0 : 2,
             color: theme.cardColor,
             child: ClipRRect(
@@ -257,10 +290,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ),
+
           const SizedBox(height: 16),
           Container(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
               color: theme.cardColor,
               borderRadius: BorderRadius.circular(14),
@@ -314,7 +347,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           ),
+
           const SizedBox(height: 16),
+
+          // --- Stats ---
           Wrap(
             spacing: 16,
             runSpacing: 16,
@@ -336,13 +372,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ],
           ),
+
           const SizedBox(height: 40),
         ],
       ),
+
+      // Bottom Nav
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         selectedItemColor: primaryGreen,
-        unselectedItemColor: isDark ? Colors.grey[500] : const Color(0xFF8FA89B),
+        unselectedItemColor:
+        isDark ? Colors.grey[500] : const Color(0xFF8FA89B),
         type: BottomNavigationBarType.fixed,
         onTap: (index) {
           setState(() {
@@ -390,8 +430,7 @@ class _StatCard extends StatelessWidget {
 
     final Color cardBackground =
     isDark ? Colors.grey[900]! : const Color(0xFFF8FAF3);
-    final Color textColor =
-    isDark ? Colors.white : const Color(0xFF26492D);
+    final Color textColor = isDark ? Colors.white : const Color(0xFF26492D);
 
     return Container(
       width: width,
