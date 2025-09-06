@@ -128,7 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 radius: 55,
                 backgroundImage: _avatarUrl != null && _avatarUrl!.isNotEmpty
                     ? NetworkImage(_avatarUrl!) // <-- Load from Supabase
-                    : const AssetImage('assets/profile_avatar.png')
+                    : const AssetImage('assets/images/signup_bk_3.png')
                 as ImageProvider, // <-- fallback
               ),
             ),
@@ -283,7 +283,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(18),
               child: Image.asset(
-                'assets/plant_sanctuary.png',
+                'assets/images/signup_bk_3.png',
                 fit: BoxFit.cover,
                 height: 180,
                 width: double.infinity,

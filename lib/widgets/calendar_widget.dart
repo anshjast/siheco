@@ -22,6 +22,9 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     DateTime(2025, 9, 2),
     DateTime(2025, 9, 3),
     DateTime(2025, 9, 4),
+    DateTime(2025, 9, 5),
+    DateTime(2025, 9, 6),
+
   };
 
   @override
