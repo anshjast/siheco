@@ -53,14 +53,14 @@ class _DailyEcoPointsState extends State<DailyEcoPoints> with AutomaticKeepAlive
     EcoTask(
         title: 'Complete a Challenge',
         subtitle: 'Finish any daily challenge',
-        points: 50,
+        points: 100,
         icon: Icons.star_border_rounded,
         iconColor: Colors.amber.shade800,
         backgroundColor: Colors.amber.shade100),
     EcoTask(
         title: 'Complete a Quiz',
         subtitle: 'Test your eco-knowledge',
-        points: 25,
+        points: 205,
         icon: Icons.quiz_outlined,
         iconColor: Colors.purple.shade800,
         backgroundColor: Colors.purple.shade100),
